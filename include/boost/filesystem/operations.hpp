@@ -191,7 +191,7 @@ namespace boost
 
   enum perms
   {
-    no_perms = 0,       // file_not_found is no_perms rather than perms_not_known
+    none = 0,       // file_not_found is perms::none rather than perms::unknown
 
     // POSIX equivalent macros given in comments.
     // Values are from POSIX and are given in octal per the POSIX standard.
@@ -200,25 +200,25 @@ namespace boost
     
     owner_read = 0400,  // S_IRUSR, Read permission, owner
     owner_write = 0200, // S_IWUSR, Write permission, owner
-    owner_exe = 0100,   // S_IXUSR, Execute/search permission, owner
+    owner_exec = 0100,   // S_IXUSR, Execute/search permission, owner
     owner_all = 0700,   // S_IRWXU, Read, write, execute/search by owner
 
     group_read = 040,   // S_IRGRP, Read permission, group
     group_write = 020,  // S_IWGRP, Write permission, group
-    group_exe = 010,    // S_IXGRP, Execute/search permission, group
+    group_exec = 010,    // S_IXGRP, Execute/search permission, group
     group_all = 070,    // S_IRWXG, Read, write, execute/search by group
 
     others_read = 04,   // S_IROTH, Read permission, others
     others_write = 02,  // S_IWOTH, Write permission, others
-    others_exe = 01,    // S_IXOTH, Execute/search permission, others
+    others_exec = 01,    // S_IXOTH, Execute/search permission, others
     others_all = 07,    // S_IRWXO, Read, write, execute/search by others
 
-    all_all = 0777,     // owner_all|group_all|others_all
+    all = 0777,     // owner_all|group_all|others_all
 
     // other POSIX bits
 
-    set_uid_on_exe = 04000, // S_ISUID, Set-user-ID on execution
-    set_gid_on_exe = 02000, // S_ISGID, Set-group-ID on execution
+    set_uid = 04000, // S_ISUID, Set-user-ID on execution
+    set_gid = 02000, // S_ISGID, Set-group-ID on execution
     sticky_bit     = 01000, // S_ISVTX,
                             // (POSIX XSI) On directories, restricted deletion flag 
                             // (V7) 'sticky bit': save swapped text even after use 
@@ -226,9 +226,9 @@ namespace boost
                             // (SVID-v4.2) On directories: restricted deletion flag
                             // Also see http://en.wikipedia.org/wiki/Sticky_bit
 
-    perms_mask = 07777,     // all_all|set_uid_on_exe|set_gid_on_exe|sticky_bit
+    mask = 07777,     // perms::all|perms::set_uid|perms::set_gid|sticky_bit
 
-    perms_not_known = 0xFFFF, // present when directory_entry cache not loaded
+    unknown = 0xFFFF, // present when directory_entry cache not loaded
 
     // options for permissions() function
 
@@ -238,10 +238,8 @@ namespace boost
                             // nor remove_perms is given, replace the current bits with
                             // the given bits.
 
-    symlink_perms = 0x4000  // on POSIX, don't resolve symlinks; implied on Windows
+    resolve_symlinks = 0x4000  // on POSIX, don't resolve symlinks; implied on Windows
   };
-
-  BOOST_BITMASK(perms)
 
 //--------------------------------------------------------------------------------------//
 //                                    file_status                                       //
@@ -251,9 +249,9 @@ namespace boost
   {
   public:
              file_status() BOOST_NOEXCEPT
-               : m_value(status_error), m_perms(perms_not_known) {}
+               : m_value(status_error), m_perms(perms::unknown) {}
     explicit file_status(file_type v) BOOST_NOEXCEPT
-               : m_value(v), m_perms(perms_not_known)  {}
+               : m_value(v), m_perms(perms::unknown)  {}
              file_status(file_type v, perms prms) BOOST_NOEXCEPT
                : m_value(v), m_perms(prms) {}
 
@@ -307,7 +305,7 @@ namespace boost
   inline bool type_present(file_status f) BOOST_NOEXCEPT
                                           { return f.type() != status_error; }
   inline bool permissions_present(file_status f) BOOST_NOEXCEPT
-                                          {return f.permissions() != perms_not_known;}
+                                          {return f.permissions() != perms::unknown;}
   inline bool status_known(file_status f) BOOST_NOEXCEPT
                                           { return type_present(f) && permissions_present(f); }
   inline bool exists(file_status f) BOOST_NOEXCEPT

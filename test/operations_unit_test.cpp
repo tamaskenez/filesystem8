@@ -89,7 +89,7 @@ namespace
     CHECK(file_size("no-such-file", ec) == static_cast<boost::uintmax_t>(-1));
     CHECK(ec == errc::no_such_file_or_directory);
 
-    CHECK(status("no-such-file") == file_status(file_not_found, no_perms));
+    CHECK(status("no-such-file") == file_status(file_not_found, perms::none));
 
     CHECK(exists("/"));
     CHECK(is_directory("/"));

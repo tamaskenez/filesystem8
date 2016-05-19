@@ -526,7 +526,7 @@ namespace
       || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".com") == 0
       || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".bat") == 0
       || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".cmd") == 0)
-      prms |= fs::owner_exe | fs::group_exe | fs::others_exe;
+      prms |= fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec;
     return prms;
   }
 
@@ -627,7 +627,7 @@ namespace
 
     if (not_found_error(errval))
     {
-      return fs::file_status(fs::file_not_found, fs::no_perms);
+      return fs::file_status(fs::file_not_found, fs::perms::none);
     }
     else if ((errval == ERROR_SHARING_VIOLATION))
     {
@@ -1383,7 +1383,7 @@ namespace detail
   }
 
 # ifdef BOOST_POSIX_API
-    const perms active_bits(all_all | set_uid_on_exe | set_gid_on_exe | sticky_bit);
+    const perms active_bits(perms::all | perms::set_uid | perms::set_gid | sticky_bit);
     inline mode_t mode_cast(perms prms) { return prms & active_bits; }
 # endif
 
@@ -1398,7 +1398,7 @@ namespace detail
 
 # ifdef BOOST_POSIX_API
     error_code local_ec;
-    file_status current_status((prms & symlink_perms)
+    file_status current_status((prms & perms::resolve_symlinks)
                                ? fs::symlink_status(p, local_ec)
                                : fs::status(p, local_ec));
     if (local_ec)
@@ -1435,7 +1435,7 @@ namespace detail
       && !(defined(__IPHONE_OS_VERSION_MIN_REQUIRED) \
            && __IPHONE_OS_VERSION_MIN_REQUIRED < 80000)
       if (::fchmodat(AT_FDCWD, p.c_str(), mode_cast(prms),
-           !(prms & symlink_perms) ? 0 : AT_SYMLINK_NOFOLLOW))
+           !(prms & perms::resolve_symlinks) ? 0 : AT_SYMLINK_NOFOLLOW))
 #   else  // fallback if fchmodat() not supported
       if (::chmod(p.c_str(), mode_cast(prms)))
 #   endif
@@ -1652,7 +1652,7 @@ namespace detail
 
       if (not_found_error(errno))
       {
-        return fs::file_status(fs::file_not_found, fs::no_perms);
+        return fs::file_status(fs::file_not_found, fs::perms::none);
       }
       if (ec == 0)
         BOOST_FILESYSTEM_THROW(filesystem_error("boost::filesystem::status",
@@ -1662,22 +1662,22 @@ namespace detail
     if (ec != 0) ec->clear();;
     if (S_ISDIR(path_stat.st_mode))
       return fs::file_status(fs::directory_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISREG(path_stat.st_mode))
       return fs::file_status(fs::regular_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISBLK(path_stat.st_mode))
       return fs::file_status(fs::block_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISCHR(path_stat.st_mode))
       return fs::file_status(fs::character_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISFIFO(path_stat.st_mode))
       return fs::file_status(fs::fifo_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISSOCK(path_stat.st_mode))
       return fs::file_status(fs::socket_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     return fs::file_status(fs::type_unknown);
 
 #   else  // Windows
@@ -1732,7 +1732,7 @@ namespace detail
 
       if (errno == ENOENT || errno == ENOTDIR) // these are not errors
       {
-        return fs::file_status(fs::file_not_found, fs::no_perms);
+        return fs::file_status(fs::file_not_found, fs::perms::none);
       }
       if (ec == 0)
         BOOST_FILESYSTEM_THROW(filesystem_error("boost::filesystem::status",
@@ -1742,25 +1742,25 @@ namespace detail
     if (ec != 0) ec->clear();
     if (S_ISREG(path_stat.st_mode))
       return fs::file_status(fs::regular_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISDIR(path_stat.st_mode))
       return fs::file_status(fs::directory_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISLNK(path_stat.st_mode))
       return fs::file_status(fs::symlink_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISBLK(path_stat.st_mode))
       return fs::file_status(fs::block_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISCHR(path_stat.st_mode))
       return fs::file_status(fs::character_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISFIFO(path_stat.st_mode))
       return fs::file_status(fs::fifo_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     if (S_ISSOCK(path_stat.st_mode))
       return fs::file_status(fs::socket_file,
-        static_cast<perms>(path_stat.st_mode) & fs::perms_mask);
+        static_cast<perms>(path_stat.st_mode) & fs::perms::mask);
     return fs::file_status(fs::type_unknown);
 
 #   else  // Windows
