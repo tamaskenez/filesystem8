@@ -143,7 +143,7 @@ namespace
 
   class Base {};
   class Derived : public Base {};
-  void fun(const boost::shared_ptr< Base >&) {}
+  void fun(const std::shared_ptr< Base >&) {}
 
   //  test_constructors  ---------------------------------------------------------------//
 
@@ -232,7 +232,7 @@ namespace
     // easy-to-make coding errors
     // path e1(x0, path::codecvt());  // fails to compile, and that is OK
 
-    boost::shared_ptr< Derived > pDerived( new Derived() ); 
+    std::shared_ptr< Derived > pDerived( new Derived() ); 
     fun( pDerived );  // tests constructor member template enable_if working correctly;
                       // will fail to compile if enable_if not taking path off the table
   }
