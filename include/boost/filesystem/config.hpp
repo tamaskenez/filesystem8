@@ -27,7 +27,6 @@
 
 #include <boost/config.hpp>
 #include <boost/system/api_config.hpp>  // for BOOST_POSIX_API or BOOST_WINDOWS_API
-#include <boost/detail/workaround.hpp>
 
 //  BOOST_FILESYSTEM_DEPRECATED needed for source compiles -----------------------------//
 
@@ -106,5 +105,7 @@
 //
 #include <boost/config/auto_link.hpp>
 #endif  // auto-linking disabled
+
+namespace boost { namespace filesystem {}}
 
 #endif // BOOST_FILESYSTEM3_CONFIG_HPP

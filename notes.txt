@@ -1,0 +1,40 @@
+boost filesytem:
+Supported source arguments: half-open iterator range, container, c-array,
+  //  and single pointer to null terminated string.
+ arguments except pointers to null terminated byte strings
+  //  support
+  //  multi-byte character strings which may have embedded nulls. Embedded null
+  //  support is required for some Asian languages on Windows.
+
+
+
+path constructors
+
+simple ones defined both in boost and std
+    path();
+    path( const path& p );
+    path( path&& p );
+
+
+
+generic ones defined both in boost and std
+
+[std] template< class Source > path( const Source& source );
+std:
+- pointer to zt
+- input iterator to zt
+- string
+
+[std] template< class InputIt > path( InputIt first, InputIt last );
+
+local-related are rejected they're non-utf8
+
+
+defined only in boost
+  [boost] path(const value_type *s) : m_pathname(s) {}
+  [boost] path(value_type *s) : m_pathname(s) {}
+  [boost] path(const string_type &s) : m_pathname(s) {}
+  [boost] path(string_type &s) : m_pathname(s) {}
+
+
+

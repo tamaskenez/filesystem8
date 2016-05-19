@@ -24,17 +24,12 @@
 #include <boost/filesystem/config.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include <boost/detail/scoped_enum_emulation.hpp>
-#include <boost/detail/bitmask.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/system/system_error.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/range/mutable_iterator.hpp>
-#include <boost/range/const_iterator.hpp>
-#include <boost/assert.hpp>
+//#include <boost/detail/scoped_enum_emulation.hpp>
+//#include <boost/detail/bitmask.hpp>
+#include <system_error>
+#include <memory>
+#include <type_traits>
+#include <cstdint>
 #include <string>
 #include <utility> // for pair
 #include <ctime>
@@ -45,7 +40,6 @@
 #  include <fstream>
 #endif
 
-#include <boost/config/abi_prefix.hpp> // must be the last #include
 
 //--------------------------------------------------------------------------------------//
 
@@ -54,6 +48,7 @@ namespace boost
   namespace filesystem
   {
 
+    namespace system = std;
     //--------------------------------------------------------------------------------------//
     //                                                                                      //
     //                            class filesystem_error                                    //

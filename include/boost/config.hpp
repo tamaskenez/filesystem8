@@ -1,0 +1,13 @@
+#ifndef CONFIG_309470394
+#define CONFIG_309470394
+
+#include <boost/filesystem/export.h>
+#undef BOOST_FILESYSTEM_DEPRECATED
+
+#define BOOST_CONSTEXPR_OR_CONST constexpr
+#define BOOST_STATIC_CONSTEXPR static BOOST_CONSTEXPR_OR_CONST
+#define BOOST_NOEXCEPT noexcept
+#define BOOST_NOEXCEPT_OR_NOTHROW noexcept
+
+#define BOOST_SYMBOL_VISIBLE BOOST_FILESYSTEM_EXPORT
+#endif

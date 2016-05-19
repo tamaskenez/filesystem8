@@ -18,16 +18,16 @@
 #endif
 
 #include <boost/filesystem/config.hpp>
-#include <boost/filesystem/path_traits.hpp>
+//#include <boost/filesystem/path_traits.hpp>
 #include <boost/system/system_error.hpp>
-#include <boost/scoped_array.hpp>
+//#include <boost/scoped_array.hpp>
 #include <locale>   // for codecvt_base::result
 #include <cstring>  // for strlen
 #include <cwchar>   // for wcslen
 
-namespace pt = boost::filesystem::path_traits;
+//namespace pt = boost::filesystem::path_traits;
 namespace fs = boost::filesystem;
-namespace bs = boost::system;
+namespace bs = std;
 
 //--------------------------------------------------------------------------------------//
 //                                  configuration                                       //
