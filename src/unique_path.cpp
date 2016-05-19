@@ -33,14 +33,14 @@
 
 namespace {
 
-void fail(int err, boost::system::error_code* ec)
+void fail(int err, std::error_code* ec)
 {
   if (ec == 0)
-    BOOST_FILESYSTEM_THROW( boost::system::system_error(err,
-      boost::system::system_category(),
+    BOOST_FILESYSTEM_THROW( std::system_error(err,
+      std::system_category(),
       "boost::filesystem::unique_path"));
 
-  ec->assign(err, boost::system::system_category());
+  ec->assign(err, std::system_category());
   return;
 }
 
@@ -71,7 +71,7 @@ int acquire_crypt_handle(HCRYPTPROV& handle)
 
 #endif
 
-void system_crypt_random(void* buf, std::size_t len, boost::system::error_code* ec)
+void system_crypt_random(void* buf, std::size_t len, std::error_code* ec)
 {
 # ifdef BOOST_POSIX_API
 
@@ -126,7 +126,7 @@ void system_crypt_random(void* buf, std::size_t len, boost::system::error_code* 
 namespace boost { namespace filesystem { namespace detail {
 
 BOOST_FILESYSTEM_DECL
-path unique_path(const path& model, system::error_code* ec)
+path unique_path(const path& model, std::error_code* ec)
 {
   std::wstring s (model.wstring());  // std::string ng for MBCS encoded POSIX
   const wchar_t hex[] = L"0123456789abcdef";

@@ -109,7 +109,7 @@ namespace
   {
     std::cout << "exception_tests..." << std::endl;
     const std::string str_1("string-1");
-    boost::system::error_code ec(12345, boost::system::system_category());
+    std::error_code ec(12345, std::system_category());
     try { throw fs::filesystem_error(str_1, ec); }
     catch (const fs::filesystem_error & ex)
     {

@@ -29,9 +29,9 @@
 #include <boost/detail/lightweight_main.hpp>
 
 namespace fs = boost::filesystem;
-using boost::system::error_code;
-using boost::system::system_category;
-using boost::system::system_error;
+using std::error_code;
+using std::system_category;
+using std::system_error;
 
 #include <fstream>
 #include <iostream>
@@ -629,7 +629,7 @@ namespace
 
     //  test iterator increment with error_code argument
     cout << "  with error_code argument" << endl;
-    boost::system::error_code ec;
+    std::error_code ec;
     int d1f1_count = 0;
     for (fs::recursive_directory_iterator it (dir, fs::symlink_option::no_recurse);
          it != fs::recursive_directory_iterator();
@@ -1521,7 +1521,7 @@ namespace
   {
     cout << "symlink_status_tests..." << endl;
 
-    boost::system::error_code ec;
+    std::error_code ec;
 
     fs::path dangling_sym(dir / "dangling-sym");
     fs::path dangling_directory_sym(dir / "dangling-directory-sym");
@@ -2141,8 +2141,8 @@ int cpp_main(int argc, char* argv[])
   BOOST_TEST(!fs::exists(dir));
 
   // several functions give unreasonable results if uintmax_t isn't 64-bits
-  cout << "sizeof(boost::uintmax_t) = " << sizeof(boost::uintmax_t) << '\n';
-  BOOST_TEST(sizeof(boost::uintmax_t) >= 8);
+  cout << "sizeof(std::uintmax_t) = " << sizeof(std::uintmax_t) << '\n';
+  BOOST_TEST(sizeof(std::uintmax_t) >= 8);
 
   initial_tests();
   predicate_and_status_tests();

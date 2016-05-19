@@ -47,7 +47,7 @@ namespace
     return file_type_tab[t];
   }
 
-  void show_status(file_status s, boost::system::error_code ec)
+  void show_status(file_status s, std::error_code ec)
   {
     boost::system::error_condition econd;
 
@@ -102,7 +102,7 @@ int cpp_main(int argc, char* argv[])
   else
     p = argv[1];
 
-  boost::system::error_code ec;
+  std::error_code ec;
   file_status s = status(p, ec);
   cout << "\nfile_status s = status(" << p << ", ec) ";
   show_status(s, ec);

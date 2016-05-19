@@ -25,20 +25,15 @@
 #include <boost/filesystem/config.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>  // for filesystem_error
-#include <boost/scoped_array.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/assert.hpp>
+#include <memory>
+#include <system_error>
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <cassert>
 
 #ifdef BOOST_WINDOWS_API
-# include "windows_file_codecvt.hpp"
 # include <windows.h>
-#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
- || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
-# include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 #endif
 
 #ifdef BOOST_FILESYSTEM_DEBUG
@@ -53,7 +48,7 @@ using boost::filesystem::path;
 using std::string;
 using std::wstring;
 
-using boost::system::error_code;
+using std::error_code;
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -119,11 +114,7 @@ namespace
       const string_type& src,
       size_type& element_pos,
       size_type& element_size,
-#     if !BOOST_WORKAROUND(BOOST_MSVC, <= 1310) // VC++ 7.1
       size_type size = string_type::npos
-#     else
-      size_type size = -1
-#     endif
     );
 
 }  // unnamed namespace

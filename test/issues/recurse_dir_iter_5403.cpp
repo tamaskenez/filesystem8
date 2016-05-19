@@ -29,9 +29,9 @@
 #include <boost/detail/lightweight_main.hpp>
 
 namespace fs = boost::filesystem;
-using boost::system::error_code;
-using boost::system::system_category;
-using boost::system::system_error;
+using std::error_code;
+using std::system_category;
+using std::system_error;
 
 #include <iostream>
 

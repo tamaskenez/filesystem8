@@ -67,9 +67,9 @@ using std::wstring;
 namespace
 {
 
-  boost::system::error_code ec;
-  const boost::system::error_code ok;
-  const boost::system::error_code ng(-1, boost::system::system_category());
+  std::error_code ec;
+  const std::error_code ok;
+  const std::error_code ng(-1, std::system_category());
 
   std::string platform(BOOST_PLATFORM);
 
@@ -1047,7 +1047,7 @@ namespace filesystem
 
     template<>
     void append<user_string::value_type>(const user_string::value_type * begin,
-      const user_string::value_type * end, string_type & target, system::error_code & ec)
+      const user_string::value_type * end, string_type & target, std::error_code & ec)
     {
       for (; begin != end && *begin; ++begin)
         target += *begin + 1;  // change so that results distinguishable from char cvts
@@ -1058,7 +1058,7 @@ namespace filesystem
     //  fine without it. But gcc 4.3.2, and presumably other versions, need it.
     template<>
     void append<user_string::value_type>(const user_string::value_type * begin,
-      string_type & target, system::error_code & ec)
+      string_type & target, std::error_code & ec)
     {
       path_traits::append<user_string::value_type>(begin,
         static_cast<const user_string::value_type *>(0), target, ec);
@@ -1067,7 +1067,7 @@ namespace filesystem
 
     template<>
     user_string convert<user_string>(const string_type & source,
-      system::error_code & ec)
+      std::error_code & ec)
     {
       user_string temp;
       for (string_type::const_iterator it = source.begin();

@@ -42,8 +42,7 @@
 #endif
 
 #include <boost/filesystem/operations.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/detail/workaround.hpp>
+#include <memory>
 #include <vector> 
 #include <cstdlib>     // for malloc, free
 #include <cstring>
@@ -61,9 +60,9 @@ namespace fs = boost::filesystem;
 using boost::filesystem::path;
 using boost::filesystem::filesystem_error;
 using boost::filesystem::perms;
-using boost::system::error_code;
+using std::error_code;
 using boost::system::error_category;
-using boost::system::system_category;
+using std::system_category;
 using std::string;
 using std::wstring;
 
@@ -86,7 +85,7 @@ using std::wstring;
 #       include <sys/mount.h>
 #     endif
 #     define BOOST_STATVFS statfs
-#     define BOOST_STATVFS_F_FRSIZE static_cast<boost::uintmax_t>(vfs.f_bsize)
+#     define BOOST_STATVFS_F_FRSIZE static_cast<std::uintmax_t>(vfs.f_bsize)
 #   endif
 #   include <dirent.h>
 #   include <unistd.h>
@@ -378,10 +377,10 @@ namespace
     return true;
   }
 
-  boost::uintmax_t remove_all_aux(const path& p, fs::file_type type,
+  std::uintmax_t remove_all_aux(const path& p, fs::file_type type,
     error_code* ec)
   {
-    boost::uintmax_t count = 1;
+    std::uintmax_t count = 1;
 
     if (type == fs::directory_file)  // but not a directory symlink
     {
@@ -665,7 +664,7 @@ namespace
       : fs::regular_file;
   }
 
-  BOOL resize_file_api(const wchar_t* p, boost::uintmax_t size)
+  BOOL resize_file_api(const wchar_t* p, std::uintmax_t size)
   {
     handle_wrapper h(CreateFileW(p, GENERIC_WRITE, 0, 0, OPEN_EXISTING,
                                 FILE_ATTRIBUTE_NORMAL, 0));
@@ -792,13 +791,13 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  path canonical(const path& p, const path& base, system::error_code* ec)
+  path canonical(const path& p, const path& base, std::error_code* ec)
   {
     path source (p.is_absolute() ? p : absolute(p, base));
     path root(source.root_path());
     path result;
 
-    system::error_code local_ec;
+    std::error_code local_ec;
     file_status stat (status(source, local_ec));
 
     if (stat.type() == fs::file_not_found)
@@ -874,7 +873,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  void copy(const path& from, const path& to, system::error_code* ec)
+  void copy(const path& from, const path& to, std::error_code* ec)
   {
     file_status s(symlink_status(from, *ec));
     if (ec != 0 && *ec) return;
@@ -901,7 +900,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  void copy_directory(const path& from, const path& to, system::error_code* ec)
+  void copy_directory(const path& from, const path& to, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
     struct stat from_stat;
@@ -920,7 +919,7 @@ namespace detail
 
   BOOST_FILESYSTEM_DECL
   void copy_symlink(const path& existing_symlink, const path& new_symlink,
-    system::error_code* ec)
+    std::error_code* ec)
   {
 # if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0600
     error(BOOST_ERROR_NOT_SUPPORTED, new_symlink, existing_symlink, ec,
@@ -935,7 +934,7 @@ namespace detail
   }
 
  BOOST_FILESYSTEM_DECL
-  bool create_directories(const path& p, system::error_code* ec)
+  bool create_directories(const path& p, std::error_code* ec)
   {
     path filename(p.filename());
     if ((filename.native().size() == 1 && filename.native()[0] == dot)
@@ -1011,7 +1010,7 @@ namespace detail
 
   BOOST_FILESYSTEM_DECL
   void create_directory_symlink(const path& to, const path& from,
-                                 system::error_code* ec)
+                                 std::error_code* ec)
   {
 #   if defined(BOOST_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
 
@@ -1116,14 +1115,14 @@ namespace detail
 
 
   BOOST_FILESYSTEM_DECL
-  void current_path(const path& p, system::error_code* ec)
+  void current_path(const path& p, std::error_code* ec)
   {
     error(!BOOST_SET_CURRENT_DIRECTORY(p.c_str()) ? BOOST_ERRNO : 0,
       p, ec, "boost::filesystem::current_path");
   }
 
   BOOST_FILESYSTEM_DECL
-  bool equivalent(const path& p1, const path& p2, system::error_code* ec)
+  bool equivalent(const path& p1, const path& p2, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
     struct stat s2;
@@ -1216,19 +1215,19 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  boost::uintmax_t file_size(const path& p, error_code* ec)
+  std::uintmax_t file_size(const path& p, error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
 
     struct stat path_stat;
     if (error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
         p, ec, "boost::filesystem::file_size"))
-      return static_cast<boost::uintmax_t>(-1);
+      return static_cast<std::uintmax_t>(-1);
    if (error(!S_ISREG(path_stat.st_mode) ? EPERM : 0,
         p, ec, "boost::filesystem::file_size"))
-      return static_cast<boost::uintmax_t>(-1);
+      return static_cast<std::uintmax_t>(-1);
 
-    return static_cast<boost::uintmax_t>(path_stat.st_size);
+    return static_cast<std::uintmax_t>(path_stat.st_size);
 
 #   else  // Windows
 
@@ -1238,19 +1237,19 @@ namespace detail
 
     if (error(::GetFileAttributesExW(p.c_str(), ::GetFileExInfoStandard, &fad)== 0
       ? BOOST_ERRNO : 0, p, ec, "boost::filesystem::file_size"))
-          return static_cast<boost::uintmax_t>(-1);
+          return static_cast<std::uintmax_t>(-1);
 
     if (error((fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)!= 0
       ? ERROR_NOT_SUPPORTED : 0, p, ec, "boost::filesystem::file_size"))
-      return static_cast<boost::uintmax_t>(-1);
+      return static_cast<std::uintmax_t>(-1);
 
-    return (static_cast<boost::uintmax_t>(fad.nFileSizeHigh)
+    return (static_cast<std::uintmax_t>(fad.nFileSizeHigh)
               << (sizeof(fad.nFileSizeLow)*8)) + fad.nFileSizeLow;
 #   endif
   }
 
   BOOST_FILESYSTEM_DECL
-  boost::uintmax_t hard_link_count(const path& p, system::error_code* ec)
+  std::uintmax_t hard_link_count(const path& p, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
 
@@ -1258,7 +1257,7 @@ namespace detail
     return error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
                   p, ec, "boost::filesystem::hard_link_count")
            ? 0
-           : static_cast<boost::uintmax_t>(path_stat.st_nlink);
+           : static_cast<std::uintmax_t>(path_stat.st_nlink);
 
 #   else // Windows
 
@@ -1289,7 +1288,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  bool is_empty(const path& p, system::error_code* ec)
+  bool is_empty(const path& p, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
 
@@ -1316,7 +1315,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  std::time_t last_write_time(const path& p, system::error_code* ec)
+  std::time_t last_write_time(const path& p, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
 
@@ -1349,7 +1348,7 @@ namespace detail
 
   BOOST_FILESYSTEM_DECL
   void last_write_time(const path& p, const std::time_t new_time,
-                        system::error_code* ec)
+                        std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
 
@@ -1388,7 +1387,7 @@ namespace detail
 # endif
 
   BOOST_FILESYSTEM_DECL
-  void permissions(const path& p, perms prms, system::error_code* ec)
+  void permissions(const path& p, perms prms, std::error_code* ec)
   {
     BOOST_ASSERT_MSG(!((prms & add_perms) && (prms & remove_perms)),
       "add_perms and remove_perms are mutually exclusive");
@@ -1475,7 +1474,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  path read_symlink(const path& p, system::error_code* ec)
+  path read_symlink(const path& p, std::error_code* ec)
   {
     path symlink_path;
 
@@ -1568,7 +1567,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  boost::uintmax_t remove_all(const path& p, error_code* ec)
+  std::uintmax_t remove_all(const path& p, error_code* ec)
   {
     error_code tmp_ec;
     file_type type = query_file_type(p, &tmp_ec);
@@ -1589,7 +1588,7 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  void resize_file(const path& p, uintmax_t size, system::error_code* ec)
+  void resize_file(const path& p, uintmax_t size, std::error_code* ec)
   {
     error(!BOOST_RESIZE_FILE(p.c_str(), size) ? BOOST_ERRNO : 0, p, ec,
       "boost::filesystem::resize_file");
@@ -1605,11 +1604,11 @@ namespace detail
       p, ec, "boost::filesystem::space"))
     {
       info.capacity 
-        = static_cast<boost::uintmax_t>(vfs.f_blocks)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_blocks)* BOOST_STATVFS_F_FRSIZE;
       info.free 
-        = static_cast<boost::uintmax_t>(vfs.f_bfree)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_bfree)* BOOST_STATVFS_F_FRSIZE;
       info.available
-        = static_cast<boost::uintmax_t>(vfs.f_bavail)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_bavail)* BOOST_STATVFS_F_FRSIZE;
     }
 
 #   else
@@ -1620,13 +1619,13 @@ namespace detail
        p, ec, "boost::filesystem::space"))
     {
       info.capacity
-        = (static_cast<boost::uintmax_t>(total.HighPart)<< 32)
+        = (static_cast<std::uintmax_t>(total.HighPart)<< 32)
           + total.LowPart;
       info.free
-        = (static_cast<boost::uintmax_t>(free.HighPart)<< 32)
+        = (static_cast<std::uintmax_t>(free.HighPart)<< 32)
           + free.LowPart;
       info.available
-        = (static_cast<boost::uintmax_t>(avail.HighPart)<< 32)
+        = (static_cast<std::uintmax_t>(avail.HighPart)<< 32)
           + avail.LowPart;
     }
 
@@ -1787,7 +1786,7 @@ namespace detail
 
    // contributed by Jeff Flinn
   BOOST_FILESYSTEM_DECL
-  path temp_directory_path(system::error_code* ec)
+  path temp_directory_path(std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
       const char* val = 0;
@@ -1857,7 +1856,7 @@ namespace detail
   }
   
   BOOST_FILESYSTEM_DECL
-  path system_complete(const path& p, system::error_code* ec)
+  path system_complete(const path& p, std::error_code* ec)
   {
 #   ifdef BOOST_POSIX_API
     return (p.empty() || p.is_absolute())
@@ -1889,11 +1888,11 @@ namespace detail
   }
 
   BOOST_FILESYSTEM_DECL
-  path weakly_canonical(const path& p, system::error_code* ec)
+  path weakly_canonical(const path& p, std::error_code* ec)
   {
     path head(p);
     path tail;
-    system::error_code tmp_ec;
+    std::error_code tmp_ec;
     path::iterator itr = p.end();
 
     for (; !head.empty(); --itr)
@@ -1938,7 +1937,7 @@ namespace detail
 //--------------------------------------------------------------------------------------//
 
   file_status
-  directory_entry::m_get_status(system::error_code* ec) const
+  directory_entry::m_get_status(std::error_code* ec) const
   {
     if (!status_known(m_status))
     {
@@ -1958,7 +1957,7 @@ namespace detail
   }
 
   file_status
-  directory_entry::m_get_symlink_status(system::error_code* ec) const
+  directory_entry::m_get_symlink_status(std::error_code* ec) const
   {
     if (!status_known(m_symlink_status))
       m_symlink_status = detail::symlink_status(m_path, ec);
@@ -2225,7 +2224,7 @@ namespace detail
   //  dir_itr_close is called both from the ~dir_itr_imp()destructor 
   //  and dir_itr_increment()
   BOOST_FILESYSTEM_DECL
-  system::error_code dir_itr_close( // never throws
+  std::error_code dir_itr_close( // never throws
     void *& handle
 #   if defined(BOOST_POSIX_API)
     , void *& buffer
@@ -2252,7 +2251,7 @@ namespace detail
   }
 
   void directory_iterator_construct(directory_iterator& it,
-    const path& p, system::error_code* ec)    
+    const path& p, std::error_code* ec)    
   {
     if (error(p.empty() ? not_found_error_code.value() : 0, p, ec,
               "boost::filesystem::directory_iterator::construct"))
@@ -2288,14 +2287,14 @@ namespace detail
   }
 
   void directory_iterator_increment(directory_iterator& it,
-    system::error_code* ec)
+    std::error_code* ec)
   {
     BOOST_ASSERT_MSG(it.m_imp.get(), "attempt to increment end iterator");
     BOOST_ASSERT_MSG(it.m_imp->handle != 0, "internal program error");
     
     path::string_type filename;
     file_status file_stat, symlink_file_stat;
-    system::error_code temp_ec;
+    std::error_code temp_ec;
 
     for (;;)
     {

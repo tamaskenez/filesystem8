@@ -46,7 +46,7 @@ namespace user
       boost::throw_exception<fs::basic_filesystem_error<mbpath> >(
         fs::basic_filesystem_error<mbpath>(
           "user::mbpath::to_external conversion error",
-          ph, boost::system::error_code( EINVAL, boost::system::errno_ecat ) ) );
+          ph, std::error_code( EINVAL, boost::system::errno_ecat ) ) );
     *to_next = '\0';
     return external_string_type( work.get() );
   }
@@ -65,7 +65,7 @@ namespace user
         boost::throw_exception<fs::basic_filesystem_error<mbpath> >(
           fs::basic_filesystem_error<mbpath>(
             "user::mbpath::to_internal conversion error",
-            boost::system::error_code( EINVAL, boost::system::errno_ecat ) ) );
+            std::error_code( EINVAL, boost::system::errno_ecat ) ) );
       *to_next = L'\0';
       return internal_string_type( work.get() );
   }
