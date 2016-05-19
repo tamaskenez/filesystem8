@@ -61,7 +61,7 @@ using boost::filesystem::path;
 using boost::filesystem::filesystem_error;
 using boost::filesystem::perms;
 using std::error_code;
-using boost::system::error_category;
+using std::error_category;
 using std::system_category;
 using std::string;
 using std::wstring;
@@ -258,8 +258,9 @@ namespace
 
   fs::file_type query_file_type(const path& p, error_code* ec);
 
+#ifdef FILESYSTEM_TODO
   boost::filesystem::directory_iterator end_dir_itr;
-
+#endif
   //  error handling helpers  ----------------------------------------------------------//
 
   bool error(err_t error_num, error_code* ec, const char* message);
@@ -327,10 +328,12 @@ namespace
 
   //  general helpers  -----------------------------------------------------------------//
 
+#ifdef FILESYSTEM_TODO
   bool is_empty_directory(const path& p)
   {
     return fs::directory_iterator(p)== end_dir_itr;
   }
+#endif
 
   bool not_found_error(int errval); // forward declaration
 
@@ -377,6 +380,7 @@ namespace
     return true;
   }
 
+#ifdef FILESYSTEM_TODO
   std::uintmax_t remove_all_aux(const path& p, fs::file_type type,
     error_code* ec)
   {
@@ -396,6 +400,7 @@ namespace
     remove_file_or_directory(p, type, ec);
     return count;
   }
+#endif
 
 #ifdef BOOST_POSIX_API
 
@@ -417,7 +422,7 @@ namespace
     const std::string& to_p, bool fail_if_exists)
   {
     const std::size_t buf_sz = 32768;
-    boost::scoped_array<char> buf(new char [buf_sz]);
+    std::unique_ptr<char[]> buf(new char [buf_sz]);
     int infile=-1, outfile=-1;  // -1 means not open
 
     // bug fixed: code previously did a stat()on the from_file first, but that
@@ -790,6 +795,7 @@ namespace detail
 #   endif
   }
 
+#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   path canonical(const path& p, const path& base, std::error_code* ec)
   {
@@ -805,8 +811,8 @@ namespace detail
       if (ec == 0)
         BOOST_FILESYSTEM_THROW(filesystem_error(
           "boost::filesystem::canonical", source,
-          error_code(system::errc::no_such_file_or_directory, system::generic_category())));
-      ec->assign(system::errc::no_such_file_or_directory, system::generic_category());
+          std::make_error_code(std::errc::no_such_file_or_directory)));
+      *ec = std::make_error_code(std::errc::no_such_file_or_directory);
       return result;
     }
     else if (local_ec)
@@ -871,7 +877,7 @@ namespace detail
     BOOST_ASSERT_MSG(result.is_absolute(), "canonical() implementation error; please report");
     return result;
   }
-
+#endif
   BOOST_FILESYSTEM_DECL
   void copy(const path& from, const path& to, std::error_code* ec)
   {
@@ -1080,7 +1086,7 @@ namespace detail
     path cur;
     for (long path_max = 128;; path_max *=2)// loop 'til buffer large enough
     {
-      boost::scoped_array<char>
+      std::unique_ptr<char[]>
         buf(new char[static_cast<std::size_t>(path_max)]);
       if (::getcwd(buf.get(), static_cast<std::size_t>(path_max))== 0)
       {
@@ -1287,6 +1293,7 @@ namespace detail
       return init_path;
   }
 
+#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   bool is_empty(const path& p, std::error_code* ec)
   {
@@ -1313,6 +1320,7 @@ namespace detail
         : (!fad.nFileSizeHigh && !fad.nFileSizeLow);
 #   endif
   }
+#endif
 
   BOOST_FILESYSTEM_DECL
   std::time_t last_write_time(const path& p, std::error_code* ec)
@@ -1442,9 +1450,9 @@ namespace detail
       if (ec == 0)
       BOOST_FILESYSTEM_THROW(filesystem_error(
           "boost::filesystem::permissions", p,
-          error_code(errno, system::generic_category())));
+          error_code(errno, std::generic_category())));
       else
-        ec->assign(errno, system::generic_category());
+        ec->assign(errno, std::generic_category());
     }
 
 # else  // Windows
@@ -1482,7 +1490,7 @@ namespace detail
 
     for (std::size_t path_max = 64;; path_max *= 2)// loop 'til buffer large enough
     {
-      boost::scoped_array<char> buf(new char[path_max]);
+      std::unique_ptr<char[]> buf(new char[path_max]);
       ssize_t result;
       if ((result=::readlink(p.c_str(), buf.get(), path_max))== -1)
       {
@@ -1496,7 +1504,7 @@ namespace detail
       {
         if(result != static_cast<ssize_t>(path_max))
         {
-          symlink_path.assign(buf.get(), buf.get() + result);
+          symlink_path = path::string_type(buf.get(), buf.get() + result);
           if (ec != 0) ec->clear();
           break;
         }
@@ -1566,6 +1574,7 @@ namespace detail
     return remove_file_or_directory(p, type, ec);
   }
 
+#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   std::uintmax_t remove_all(const path& p, error_code* ec)
   {
@@ -1579,7 +1588,7 @@ namespace detail
       ? remove_all_aux(p, type, ec)
       : 0;
   }
-
+#endif
   BOOST_FILESYSTEM_DECL
   void rename(const path& old_p, const path& new_p, error_code* ec)
   {
@@ -1887,6 +1896,7 @@ namespace detail
 #   endif
   }
 
+#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   path weakly_canonical(const path& p, std::error_code* ec)
   {
@@ -1928,6 +1938,7 @@ namespace detail
           ? (head/tail).lexically_normal()  
           : head/tail);
   }
+#endif
 }  // namespace detail
 
 //--------------------------------------------------------------------------------------//
@@ -1969,30 +1980,6 @@ namespace detail
 //  <boost/filesystem/path_traits.hpp>, thus avoiding header circularity.
 //  test cases are in operations_unit_test.cpp
 
-namespace path_traits
-{
-  void dispatch(const directory_entry & de,
-#                ifdef BOOST_WINDOWS_API
-    std::wstring& to,
-#                else   
-    std::string& to,
-#                endif
-    const codecvt_type &)
-  {
-    to = de.path().native();
-  }
-
-  void dispatch(const directory_entry & de,
-#                ifdef BOOST_WINDOWS_API
-    std::wstring& to
-#                else   
-    std::string& to
-#                endif
-    )
-  {
-    to = de.path().native();
-  }
-}  // namespace path_traits
 } // namespace filesystem
 } // namespace boost
 
@@ -2250,6 +2237,7 @@ namespace detail
 #   endif
   }
 
+#ifdef FILESYSTEM_TODO
   void directory_iterator_construct(directory_iterator& it,
     const path& p, std::error_code* ec)    
   {
@@ -2335,6 +2323,7 @@ namespace detail
       }
     }
   }
+#endif
 }  // namespace detail
 } // namespace filesystem
 } // namespace boost

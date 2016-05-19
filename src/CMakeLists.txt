@@ -4,7 +4,7 @@ add_library(filesystem
     path
     #path_traits
     portability
-    unique_path
+    #unique_path
     #utf8_codecvt_facet
     #windows_file_codecvt
 )

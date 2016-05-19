@@ -47,14 +47,13 @@ namespace boost
   namespace filesystem
   {
 
-    namespace system = std;
     //--------------------------------------------------------------------------------------//
     //                                                                                      //
     //                            class filesystem_error                                    //
     //                                                                                      //
     //--------------------------------------------------------------------------------------//
 
-    class BOOST_SYMBOL_VISIBLE filesystem_error : public system::system_error
+    class BOOST_SYMBOL_VISIBLE filesystem_error : public std::system_error
     {
       // see http://www.boost.org/more/error_handling.html for design rationale
 
@@ -68,7 +67,7 @@ namespace boost
 
       filesystem_error(
         const std::string & what_arg, std::error_code ec) BOOST_NOEXCEPT
-        : system::system_error(ec, what_arg)
+        : std::system_error(ec, what_arg)
       {
         try
         {
@@ -80,7 +79,7 @@ namespace boost
       filesystem_error(
         const std::string & what_arg, const path& path1_arg,
         std::error_code ec) BOOST_NOEXCEPT
-        : system::system_error(ec, what_arg)
+        : std::system_error(ec, what_arg)
       {
         try
         {
@@ -93,7 +92,7 @@ namespace boost
       filesystem_error(
         const std::string & what_arg, const path& path1_arg,
         const path& path2_arg, std::error_code ec) BOOST_NOEXCEPT
-        : system::system_error(ec, what_arg)
+        : std::system_error(ec, what_arg)
       {
         try
         {
@@ -120,13 +119,13 @@ namespace boost
         const char* what() const BOOST_NOEXCEPT_OR_NOTHROW
       {
         if (!m_imp_ptr.get())
-        return system::system_error::what();
+        return std::system_error::what();
 
         try
         {
           if (m_imp_ptr->m_what.empty())
           {
-            m_imp_ptr->m_what = system::system_error::what();
+            m_imp_ptr->m_what = std::system_error::what();
             if (!m_imp_ptr->m_path1.empty())
             {
               m_imp_ptr->m_what += ": \"";
@@ -144,7 +143,7 @@ namespace boost
         }
         catch (...)
         {
-          return system::system_error::what();
+          return std::system_error::what();
         }
       }
 
@@ -414,8 +413,10 @@ BOOST_BITMASK(perms)
     path system_complete(const path& p, std::error_code* ec=0);
     BOOST_FILESYSTEM_DECL
     path temp_directory_path(std::error_code* ec=0);
+#if 0 //no unique_path in std
     BOOST_FILESYSTEM_DECL
     path unique_path(const path& p, std::error_code* ec=0);
+#endif
     BOOST_FILESYSTEM_DECL
     path weakly_canonical(const path& p, std::error_code* ec = 0);
   }  // namespace detail             
@@ -712,12 +713,14 @@ BOOST_BITMASK(perms)
   inline
   path temp_directory_path(std::error_code& ec) 
                                        {return detail::temp_directory_path(&ec);}
+#if 0
   inline
   path unique_path(const path& p="%%%%-%%%%-%%%%-%%%%")
                                        {return detail::unique_path(p);}
   inline
   path unique_path(const path& p, std::error_code& ec)
                                        {return detail::unique_path(p, &ec);}
+#endif
   inline
   path weakly_canonical(const path& p)   {return detail::weakly_canonical(p);}
  
@@ -962,7 +965,12 @@ namespace detail
   inline
   directory_iterator range_end(const directory_iterator&) BOOST_NOEXCEPT
     {return directory_iterator();}
+
+#endif // FILESYSTEM_TODO
+
   }  // namespace filesystem
+
+#ifdef FILESYSTEM_TODO
 
   //  namespace boost template specializations
   template<>
@@ -972,7 +980,9 @@ namespace detail
   struct range_const_iterator <boost::filesystem::directory_iterator>
     { typedef boost::filesystem::directory_iterator type; };
 
-#endif
+#endif // FILESYSTEM_TODO
+
+#ifdef FILESYSTEM_TODO
 
 namespace filesystem
 {
@@ -993,7 +1003,7 @@ namespace filesystem
   BOOST_SCOPED_ENUM_END
 
   BOOST_BITMASK(BOOST_SCOPED_ENUM(symlink_option))
-#ifdef FILESYSTEM_TODO
+
   namespace detail
   {
     struct recur_dir_itr_imp
@@ -1319,6 +1329,10 @@ namespace filesystem
   struct range_const_iterator <boost::filesystem::recursive_directory_iterator>
                         { typedef boost::filesystem::recursive_directory_iterator type; };
 
+#endif // FILESYSTEM_TODO
+
+#ifdef FILESYSTEM_TODO
+
 namespace filesystem
 {
 
@@ -1336,8 +1350,10 @@ namespace filesystem
   {
     BOOST_FILESYSTEM_DECL bool possible_large_file_size_support();
   }
-#endif
   } // namespace filesystem
+
+#endif // FILESYSTEM_TODO
+
 } // namespace boost
 
 #endif // BOOST_FILESYSTEM3_OPERATIONS_HPP

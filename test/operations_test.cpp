@@ -472,7 +472,7 @@ namespace
       error_code ecx;
       fs::directory_iterator itx("nosuchdirectory", ecx);
       BOOST_TEST(ecx);
-      BOOST_TEST(ecx == boost::system::errc::no_such_file_or_directory);
+      BOOST_TEST(ecx == boost::std::errc::no_such_file_or_directory);
     }
     catch (const fs::filesystem_error &) { dir_itr_exception = true; }
     BOOST_TEST(!dir_itr_exception);

@@ -170,10 +170,12 @@ namespace filesystem
     return *this;
   }
 
+#ifdef FILESYSTEM_TODO
   int path::compare(const path& p) const BOOST_NOEXCEPT
   {
     return detail::lex_compare(begin(), end(), p.begin(), p.end());
   }
+#endif
 
 # ifdef BOOST_WINDOWS_API
 
@@ -278,6 +280,7 @@ namespace filesystem
     return temp;
   } 
 
+#ifdef FILESYSTEM_TODO
   path path::root_name() const
   {
     iterator itr(begin());
@@ -295,16 +298,17 @@ namespace filesystem
       ? itr.m_element
       : path();
   }
-
+#endif
   path path::root_directory() const
   {
     size_type pos(root_directory_start(m_pathname, m_pathname.size()));
 
     return pos == string_type::npos
       ? path()
-      : path(m_pathname.c_str() + pos, m_pathname.c_str() + pos + 1);
+      : path(string_type(m_pathname.c_str() + pos, m_pathname.c_str() + pos + 1));
   }
 
+#if FILESYSTEM_TODO
   path path::relative_path() const
   {
     iterator itr(begin());
@@ -318,7 +322,7 @@ namespace filesystem
 
     return path(m_pathname.c_str() + itr.m_pos);
   }
-
+#endif
   string_type::size_type path::m_parent_path_end() const
   {
     size_type end_pos(filename_pos(m_pathname, m_pathname.size()));
@@ -345,7 +349,7 @@ namespace filesystem
    size_type end_pos(m_parent_path_end());
    return end_pos == string_type::npos
      ? path()
-     : path(m_pathname.c_str(), m_pathname.c_str() + end_pos);
+     : path(string_type(m_pathname.c_str(), m_pathname.c_str() + end_pos));
   }
 
   path path::filename() const
@@ -366,7 +370,7 @@ namespace filesystem
     size_type pos(name.m_pathname.rfind(dot));
     return pos == string_type::npos
       ? name
-      : path(name.m_pathname.c_str(), name.m_pathname.c_str() + pos);
+      : path(string_type(name.m_pathname.c_str(), name.m_pathname.c_str() + pos));
   }
 
   path path::extension() const
@@ -381,6 +385,7 @@ namespace filesystem
 
   //  lexical operations  --------------------------------------------------------------//
 
+#ifdef FILESYSTEM_TODO
   namespace detail
   {
     // C++14 provide a mismatch algorithm with four iterator arguments(), but earlier
@@ -397,7 +402,8 @@ namespace filesystem
       return std::make_pair(it1, it2);
     }
   }
-
+#endif
+#ifdef FILESYSTEM_TODO
   path path::lexically_relative(const path& base) const
   {
     std::pair<path::iterator, path::iterator> mm
@@ -486,7 +492,7 @@ namespace filesystem
       temp /= detail::dot_path();
     return temp;
   }
-
+#endif
 }  // namespace filesystem
 }  // namespace boost
   
@@ -679,6 +685,8 @@ namespace filesystem
 {
   namespace detail
   {
+#ifdef FILESYSTEM_TODO
+
     BOOST_FILESYSTEM_DECL
       int lex_compare(path::iterator first1, path::iterator last1,
         path::iterator first2, path::iterator last2)
@@ -695,6 +703,8 @@ namespace filesystem
         return 0;
       return first1 == last1 ? -1 : 1;
     }
+
+#endif
 
     BOOST_FILESYSTEM_DECL
     const path&  dot_path()
@@ -718,13 +728,13 @@ namespace filesystem
       return dot_dot;
     }
   }
-
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
 //                        class path::iterator implementation                           //
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
+#ifdef FILESYSTEM_TODO
   path::iterator path::begin() const
   {
     iterator itr;
@@ -838,118 +848,6 @@ namespace filesystem
     if (it.m_element.m_pathname == preferred_separator_string) // needed for Windows, harmless on POSIX 
       it.m_element.m_pathname = separator_string;    // generic format; see docs 
   }
-
-}  // namespace filesystem
-}  // namespace boost
-
-namespace
-{
-
-  //------------------------------------------------------------------------------------//
-  //                                locale helpers                                      //
-  //------------------------------------------------------------------------------------//
-
-  //  Prior versions of these locale and codecvt implementations tried to take advantage
-  //  of static initialization where possible, kept a local copy of the current codecvt
-  //  facet (to avoid codecvt() having to call use_facet()), and was not multi-threading
-  //  safe (again for efficiency).
-  //
-  //  This was error prone, and required different implementation techniques depending
-  //  on the compiler and also whether static or dynamic linking was used. Furthermore,
-  //  users could not easily provide their multi-threading safe wrappers because the
-  //  path interface requires the implementation itself to call codecvt() to obtain the
-  //  default facet, and the initialization of the static within path_locale() could race.
-  //
-  //  The code below is portable to all platforms, is much simpler, and hopefully will be 
-  //  much more robust. Timing tests (on Windows, using a Visual C++ release build)
-  //  indicated the current code is roughly 9% slower than the previous code, and that
-  //  seems a small price to pay for better code that is easier to use. 
-
-  std::locale default_locale()
-  {
-# if defined(BOOST_WINDOWS_API)
-    std::locale global_loc = std::locale();
-    return std::locale(global_loc, new windows_file_codecvt);
-# elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__) \
-  || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__HAIKU__)
-    // "All BSD system functions expect their string parameters to be in UTF-8 encoding
-    // and nothing else." See
-    // http://developer.apple.com/mac/library/documentation/MacOSX/Conceptual/BPInternational/Articles/FileEncodings.html
-    //
-    // "The kernel will reject any filename that is not a valid UTF-8 string, and it will
-    // even be normalized (to Unicode NFD) before stored on disk, at least when using HFS.
-    // The right way to deal with it would be to always convert the filename to UTF-8
-    // before trying to open/create a file." See
-    // http://lists.apple.com/archives/unix-porting/2007/Sep/msg00023.html
-    //
-    // "How a file name looks at the API level depends on the API. Current Carbon APIs
-    // handle file names as an array of UTF-16 characters; POSIX ones handle them as an
-    // array of UTF-8, which is why UTF-8 works well in Terminal. How it's stored on disk
-    // depends on the disk format; HFS+ uses UTF-16, but that's not important in most
-    // cases." See
-    // http://lists.apple.com/archives/applescript-users/2002/Sep/msg00319.html
-    //
-    // Many thanks to Peter Dimov for digging out the above references!
-
-    std::locale global_loc = std::locale();
-    return std::locale(global_loc, new boost::filesystem::detail::utf8_codecvt_facet);
-# else  // Other POSIX
-    // ISO C calls std::locale("") "the locale-specific native environment", and this
-    // locale is the default for many POSIX-based operating systems such as Linux.
-    return std::locale("");
-# endif
-  }
-
-  std::locale& path_locale()
-  // std::locale("") construction, needed on non-Apple POSIX systems, can throw
-  // (if environmental variables LC_MESSAGES or LANG are wrong, for example), so
-  // path_locale() provides lazy initialization via a local static to ensure that any 
-  // exceptions occur after main() starts and so can be caught. Furthermore,
-  // path_locale() is only called if path::codecvt() or path::imbue() are themselves
-  // actually called, ensuring that an exception will only be thrown if std::locale("")
-  // is really needed.
-  {
-    // [locale] paragraph 6: Once a facet reference is obtained from a locale object by
-    // calling use_facet<>, that reference remains usable, and the results from member
-    // functions of it may be cached and re-used, as long as some locale object refers
-    // to that facet.
-    static std::locale loc(default_locale());
-#ifdef BOOST_FILESYSTEM_DEBUG
-    std::cout << "***** path_locale() called" << std::endl;
 #endif
-    return loc;
-  }
-}  // unnamed namespace
-
-//--------------------------------------------------------------------------------------//
-//              path::codecvt() and path::imbue() implementation                        //
-//--------------------------------------------------------------------------------------//
-
-namespace boost
-{
-namespace filesystem
-{
-  // See comments above
-
-  const path::codecvt_type& path::codecvt()
-  {
-#ifdef BOOST_FILESYSTEM_DEBUG
-    std::cout << "***** path::codecvt() called" << std::endl;
-#endif
-    BOOST_ASSERT_MSG(&path_locale(), "boost::filesystem::path locale initialization error");
-
-    return std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t> >(path_locale());
-  }
-
-  std::locale path::imbue(const std::locale& loc)
-  {
-#ifdef BOOST_FILESYSTEM_DEBUG
-    std::cout << "***** path::imbue() called" << std::endl;
-#endif
-    std::locale temp(path_locale());
-    path_locale() = loc;
-    return temp;
-  }
-
 }  // namespace filesystem
 }  // namespace boost
