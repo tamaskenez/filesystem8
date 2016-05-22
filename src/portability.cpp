@@ -9,7 +9,7 @@
 
 //--------------------------------------------------------------------------------------// 
 
-// define BOOST_FILESYSTEM_SOURCE so that <boost/filesystem/config.hpp> knows
+// define BOOST_FILESYSTEM_SOURCE so that <filesystem8/config.hpp> knows
 // the library is being built (possibly exporting rather than importing code)
 #define BOOST_FILESYSTEM_SOURCE 
 
@@ -17,8 +17,8 @@
 # define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/config.hpp>
-#include <boost/filesystem/path.hpp>
+#include <filesystem8/config.hpp>
+#include <filesystem8/path.hpp>
 
 namespace fs = boost::filesystem;
 

@@ -12,22 +12,22 @@
 //  See deprecated_test for tests of deprecated features
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 
-#include <boost/filesystem/config.hpp>
+#include <filesystem8/config.hpp>
 # ifdef BOOST_FILESYSTEM_NARROW_ONLY
 #   error This compiler or standard library does not support wide-character strings or paths
 # endif
 
 #include "mbpath.hpp"
 #include <iostream>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
+#include <filesystem8/operations.hpp>
+#include <filesystem8/fstream.hpp>
 #include "../src/utf8_codecvt_facet.hpp"
 
 namespace fs = boost::filesystem;
 
 namespace
 {
-  // we can't use boost::filesystem::copy_file() because the argument types
+  // we can't use filesystem8::copy_file() because the argument types
   // differ, so provide a not-very-smart replacement.
 
   void copy_file( const fs::wpath & from, const user::mbpath & to )

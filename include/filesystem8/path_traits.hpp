@@ -16,7 +16,7 @@
 #   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
 # endif
 
-#include <boost/filesystem/config.hpp>
+#include <filesystem8/config.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_array.hpp>
 #include <boost/type_traits/decay.hpp>
@@ -345,7 +345,7 @@ namespace path_traits {
     );
 
 
-}}} // namespace boost::filesystem::path_traits
+}}} // namespace filesystem8::path_traits
 
 #include <boost/config/abi_suffix.hpp> // pops abi_prefix.hpp pragmas
 

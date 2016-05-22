@@ -18,7 +18,7 @@
 #  define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/convenience.hpp>
+#include <filesystem8/convenience.hpp>
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )

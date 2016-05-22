@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0.
 //  See http://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/path.hpp>
+#include <filesystem8/operations.hpp>
 #include <string>
 #include <cassert>
 #include <windows.h>

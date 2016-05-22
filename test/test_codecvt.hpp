@@ -10,7 +10,7 @@
 #ifndef BOOST_FILESYSTEM3_TEST_CODECVT_HPP
 #define BOOST_FILESYSTEM3_TEST_CODECVT_HPP
 
-#include <boost/filesystem/config.hpp>
+#include <filesystem8/config.hpp>
 #include <locale>
 #include <cwchar>  // for mbstate_t
 

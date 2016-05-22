@@ -12,10 +12,10 @@
 #ifndef BOOST_FILESYSTEM_FILESYSTEM_HPP
 #define BOOST_FILESYSTEM_FILESYSTEM_HPP
 
-#  include <boost/filesystem/config.hpp>
-#  include <boost/filesystem/path.hpp>
-#  include <boost/filesystem/operations.hpp>
-#  include <boost/filesystem/convenience.hpp>
-#  include <boost/filesystem/string_file.hpp>
+#  include <filesystem8/config.hpp>
+#  include <filesystem8/path.hpp>
+#  include <filesystem8/operations.hpp>
+#  include <filesystem8/convenience.hpp>
+#  include <filesystem8/string_file.hpp>
 
 #endif  // BOOST_FILESYSTEM_FILESYSTEM_HPP 

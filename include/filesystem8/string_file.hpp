@@ -11,8 +11,8 @@
 #define BOOST_FILESYSTEM_STRING_FILE_HPP
 
 #include <string>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/fstream.hpp>
+#include <filesystem8/operations.hpp>
 
 namespace boost
 {

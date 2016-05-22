@@ -7,7 +7,7 @@
 
 //  Library home page: http://www.boost.org/libs/filesystem
 
-#include <boost/filesystem.hpp>
+#include <filesystem8/filesystem.hpp>
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  boost::filesystem::path p(argv[1]), name(p.filename());
+  filesystem8::path p(argv[1]), name(p.filename());
 
   for(;;)
   {

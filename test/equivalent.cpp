@@ -10,13 +10,13 @@
 
 //----------------------------------------------------------------------------//
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/operations.hpp>
 #include <iostream>
 #include <exception>
 
 int main( int argc, char * argv[] )
 {
-  boost::filesystem::path::default_name_check( boost::filesystem::native );
+  filesystem8::path::default_name_check( filesystem8::native );
   if ( argc != 3 )
   {
     std::cout << "Usage: equivalent path1 path2\n";
@@ -26,7 +26,7 @@ int main( int argc, char * argv[] )
   bool eq;
   try
   {
-    eq = boost::filesystem::equivalent( argv[1], argv[2] );
+    eq = filesystem8::equivalent( argv[1], argv[2] );
   }
   catch ( const std::exception & ex )
   {

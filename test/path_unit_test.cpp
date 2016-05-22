@@ -29,9 +29,9 @@
 # define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem8/path.hpp>
 
-#include <boost/filesystem/detail/utf8_codecvt_facet.hpp>  // for imbue tests
+#include <filesystem8/detail/utf8_codecvt_facet.hpp>  // for imbue tests
 #include "test_codecvt.hpp"                                // for codecvt arg tests
 #include <boost/detail/lightweight_test_report.hpp>
 #include <boost/smart_ptr.hpp>  // used constructor tests
@@ -48,7 +48,7 @@
 
 namespace fs = boost::filesystem;
 namespace bs = boost::system;
-using boost::filesystem::path;
+using filesystem8::path;
 using std::cout;
 using std::endl;
 using std::string;

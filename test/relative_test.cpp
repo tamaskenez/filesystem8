@@ -13,11 +13,11 @@
 //
 //  ----------------------------------------------------------------------------------  //
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem8/path.hpp>
 #include <boost/detail/lightweight_test_report.hpp>
 #include <iostream>
 
-using boost::filesystem::path;
+using filesystem8::path;
 using std::cout;
 using std::endl;
 

@@ -9,7 +9,7 @@
 //  Encodes wide character paths as MBCS
 //  See http://../doc/path.htm#mbpath for more information
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem8/path.hpp>
 #include <cwchar>     // for std::mbstate_t
 #include <string>
 #include <locale>
@@ -18,7 +18,7 @@ namespace user
 {
   struct mbpath_traits;
   
-  typedef boost::filesystem::basic_path<std::wstring, mbpath_traits> mbpath;
+  typedef filesystem8::basic_path<std::wstring, mbpath_traits> mbpath;
 
   struct mbpath_traits
   {

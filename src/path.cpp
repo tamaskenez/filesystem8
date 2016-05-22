@@ -22,9 +22,9 @@
 # define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/config.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>  // for filesystem_error
+#include <filesystem8/config.hpp>
+#include <filesystem8/path.hpp>
+#include <filesystem8/operations.hpp>  // for filesystem_error
 #include <memory>
 #include <system_error>
 #include <algorithm>
@@ -43,7 +43,7 @@
 
 namespace fs = boost::filesystem;
 
-using boost::filesystem::path;
+using filesystem8::path;
 
 using std::string;
 using std::wstring;

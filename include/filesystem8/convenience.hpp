@@ -19,7 +19,7 @@
 #   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
 # endif
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/operations.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <boost/config/abi_prefix.hpp> // must be the last #include

@@ -21,8 +21,8 @@
 #   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
 # endif
 
-#include <boost/filesystem/config.hpp>
-#include <boost/filesystem/path.hpp>
+#include <filesystem8/config.hpp>
+#include <filesystem8/path.hpp>
 
 #include <boost/detail/bitmask.hpp>
 #include <system_error>
@@ -741,13 +741,13 @@ BOOST_BITMASK(perms)
 class BOOST_FILESYSTEM_DECL directory_entry
 {
 public:
-  typedef boost::filesystem::path::value_type value_type;   // enables class path ctor taking directory_entry
+  typedef filesystem8::path::value_type value_type;   // enables class path ctor taking directory_entry
 
   directory_entry() BOOST_NOEXCEPT {}
-  explicit directory_entry(const boost::filesystem::path& p)
+  explicit directory_entry(const filesystem8::path& p)
     : m_path(p), m_status(file_status()), m_symlink_status(file_status())
     {}
-  directory_entry(const boost::filesystem::path& p,
+  directory_entry(const filesystem8::path& p,
     file_status st, file_status symlink_st = file_status())
     : m_path(p), m_status(st), m_symlink_status(symlink_st) {}
 
@@ -782,11 +782,11 @@ public:
   }
 #endif
 
-  void assign(const boost::filesystem::path& p,
+  void assign(const filesystem8::path& p,
     file_status st = file_status(), file_status symlink_st = file_status())
     { m_path = p; m_status = st; m_symlink_status = symlink_st; }
 
-  void replace_filename(const boost::filesystem::path& p,
+  void replace_filename(const filesystem8::path& p,
     file_status st = file_status(), file_status symlink_st = file_status())
   {
     m_path.remove_filename();
@@ -796,13 +796,13 @@ public:
   }
 
 # ifndef BOOST_FILESYSTEM_NO_DEPRECATED
-  void replace_leaf(const boost::filesystem::path& p,
+  void replace_leaf(const filesystem8::path& p,
     file_status st, file_status symlink_st)
       { replace_filename(p, st, symlink_st); }
 # endif
 
-  const boost::filesystem::path&  path() const BOOST_NOEXCEPT {return m_path;}
-  operator const boost::filesystem::path&() const BOOST_NOEXCEPT
+  const filesystem8::path&  path() const BOOST_NOEXCEPT {return m_path;}
+  operator const filesystem8::path&() const BOOST_NOEXCEPT
                                                               {return m_path;}
   file_status   status() const                                {return m_get_status();}
   file_status   status(std::error_code& ec) const BOOST_NOEXCEPT
@@ -819,7 +819,7 @@ public:
   bool operator>=(const directory_entry& rhs) const BOOST_NOEXCEPT {return m_path >= rhs.m_path;} 
 
 private:
-  boost::filesystem::path   m_path;
+  filesystem8::path   m_path;
   mutable file_status       m_status;           // stat()-like
   mutable file_status       m_symlink_status;   // lstat()-like
 
@@ -1006,7 +1006,7 @@ namespace filesystem
 
     //  Implementation is inline to avoid dynamic linking difficulties with m_stack:
     //  Microsoft warning C4251, m_stack needs to have dll-interface to be used by
-    //  clients of struct 'boost::filesystem::detail::recur_dir_itr_imp'
+    //  clients of struct 'filesystem8::detail::recur_dir_itr_imp'
 
     inline
     bool recur_dir_itr_imp::push_directory(std::error_code& ec) BOOST_NOEXCEPT

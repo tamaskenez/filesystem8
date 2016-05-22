@@ -49,7 +49,7 @@
 #  define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/operations.hpp>
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )
@@ -67,7 +67,7 @@
 #include <boost/detail/lightweight_main.hpp>
 
 namespace fs = boost::filesystem;
-using boost::filesystem::path;
+using filesystem8::path;
 using boost::next;
 using boost::prior;
 
@@ -1929,9 +1929,9 @@ namespace
 
 } // unnamed namespace
 
-static boost::filesystem::path ticket_6737 = "FilePath";  // #6737 reported this crashed
+static filesystem8::path ticket_6737 = "FilePath";  // #6737 reported this crashed
                                                           // on VC++ debug mode build 
-const boost::filesystem::path ticket_6690("test");  // #6690 another V++ static init crash
+const filesystem8::path ticket_6690("test");  // #6690 another V++ static init crash
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //

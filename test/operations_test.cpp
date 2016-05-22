@@ -17,7 +17,7 @@
 #  define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/operations.hpp>
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )
@@ -295,8 +295,8 @@ namespace
         // the stdcxx standard library apparently appends additional info
         // to what(), so check only the initial portion: 
         BOOST_TEST(std::strncmp(x.what(),
-          "boost::filesystem::create_directory",
-          sizeof("boost::filesystem::create_directory")-1) == 0);
+          "filesystem8::create_directory",
+          sizeof("filesystem8::create_directory")-1) == 0);
     }
     BOOST_TEST(exception_thrown);
 
@@ -314,7 +314,7 @@ namespace
       if (report_throws) cout << x.what() << endl;
       if (platform == "Windows" && language_id == 0x0409) // English (United States)
         BOOST_TEST(std::strcmp(x.what(),
-          "boost::filesystem::create_directory: The system cannot find the path specified") == 0);
+          "filesystem8::create_directory: The system cannot find the path specified") == 0);
     }
     BOOST_TEST(exception_thrown);
 
@@ -333,7 +333,7 @@ namespace
       if (platform == "Windows" && language_id == 0x0409) // English (United States)
       {
         bool ok (std::strcmp(x.what(),
-          "boost::filesystem::create_directory: The system cannot find the path specified: \"no-such-dir/foo/bar\"") == 0);
+          "filesystem8::create_directory: The system cannot find the path specified: \"no-such-dir/foo/bar\"") == 0);
         BOOST_TEST(ok);
         if (!ok)
         {
@@ -358,7 +358,7 @@ namespace
       if (platform == "Windows" && language_id == 0x0409) // English (United States)
       {
         bool ok (std::strcmp(x.what(),
-          "boost::filesystem::create_directory: The system cannot find the path specified: \"no-such-dir/foo/bar\"") == 0);
+          "filesystem8::create_directory: The system cannot find the path specified: \"no-such-dir/foo/bar\"") == 0);
         BOOST_TEST(ok);
         if (!ok)
         {

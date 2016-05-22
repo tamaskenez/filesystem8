@@ -18,7 +18,7 @@
 # define BOOST_ALL_NO_LIB
 #endif
 
-#include <boost/filesystem/config.hpp>
+#include <filesystem8/config.hpp>
 #include <boost/system/config.hpp>
 
 #ifndef BOOST_FILESYSTEM_STATIC_LINK

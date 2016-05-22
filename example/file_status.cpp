@@ -10,7 +10,7 @@
 #include <iostream>
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem8/filesystem.hpp>
 #include <boost/detail/lightweight_main.hpp>
 
 using std::cout; using std::endl;

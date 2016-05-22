@@ -13,7 +13,7 @@
 
 //--------------------------------------------------------------------------------------//
 
-#include <boost/filesystem.hpp>
+#include <filesystem8/filesystem.hpp>
 #include <boost/detail/lightweight_main.hpp>
 #include <windows.h>
 #include <map>
@@ -102,7 +102,7 @@ int cpp_main( int argc, char* argv[])
     "_detail_directory_symlink"  // internal use only; never exposed to users
   };
 
-  std::cout << "boost::filesystem::status().type() is " << types[stat.type()] << std::endl;
+  std::cout << "filesystem8::status().type() is " << types[stat.type()] << std::endl;
 
   return 0;
 }

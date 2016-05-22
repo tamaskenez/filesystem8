@@ -13,7 +13,7 @@
 
 #define BOOST_FILESYSTEM_DEPRECATED
 
-#include <boost/filesystem.hpp>
+#include <filesystem8/filesystem.hpp>
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )
@@ -24,7 +24,7 @@
 #include <boost/detail/lightweight_main.hpp>
 
 namespace fs = boost::filesystem;
-using boost::filesystem::path;
+using filesystem8::path;
 
 #define PATH_CHECK(a, b) check(a, b, __LINE__)
 

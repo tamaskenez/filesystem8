@@ -21,7 +21,7 @@
 #   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
 # endif
 
-#include <boost/filesystem/config.hpp>
+#include <filesystem8/config.hpp>
 #include <system_error>
 #include <memory>
 #include <iomanip>
@@ -410,8 +410,8 @@ namespace filesystem
   {
   private:
     friend class iterator_facade<path::iterator, path const, std::bidirectional_iterator_tag>;
-    friend class boost::filesystem::path;
-    friend class boost::filesystem::path::reverse_iterator;
+    friend class filesystem8::path;
+    friend class filesystem8::path::reverse_iterator;
     friend void m_path_iterator_increment(path::iterator & it);
     friend void m_path_iterator_decrement(path::iterator & it);
 
@@ -454,7 +454,7 @@ namespace filesystem
         m_element = *--itr;
     }
   private:
-    friend class boost::filesystem::path;
+    friend class filesystem8::path;
 
     const path& dereference() const { return m_element; }
     bool equal(const reverse_iterator& rhs) const { return m_itr == rhs.m_itr; }

@@ -17,19 +17,19 @@
 #  define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem/fstream.hpp>
+#include <filesystem8/fstream.hpp>
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )
 #   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
 # endif
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem8/operations.hpp>
 #include <string>
 #include <iostream>
 #include <cstdio> // for std::remove
 
-#include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+#include <filesystem8/detail/utf8_codecvt_facet.hpp>
 
 namespace fs = boost::filesystem;
 

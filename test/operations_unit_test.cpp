@@ -24,7 +24,7 @@
 #  define BOOST_SYSTEM_NO_DEPRECATED
 #endif
 
-#include <boost/filesystem.hpp>   // make sure filesystem.hpp works
+#include <filesystem8/filesystem.hpp>   // make sure filesystem.hpp works
 
 #include <boost/config.hpp>
 # if defined( BOOST_NO_STD_WSTRING )
@@ -106,7 +106,7 @@ namespace
     CHECK(exists("/"));
     CHECK(is_directory("/"));
     CHECK(!is_regular_file("/"));
-    CHECK(!boost::filesystem::is_empty("/"));
+    CHECK(!filesystem8::is_empty("/"));
     CHECK(!is_other("/"));
   }
 
@@ -243,7 +243,7 @@ namespace
 
     CHECK(!create_directory("/", ec));
 
-    CHECK(!boost::filesystem::remove("no-such-file-or-directory"));
+    CHECK(!filesystem8::remove("no-such-file-or-directory"));
     CHECK(!remove_all("no-such-file-or-directory"));
 
     space_info info = space("/");
@@ -298,7 +298,7 @@ namespace
     { 
       file_size("no-such-file");
     }
-    catch (const boost::filesystem::filesystem_error & ex)
+    catch (const filesystem8::filesystem_error & ex)
     {
       threw = true;
       cout << "\nas expected, attempt to get size of non-existent file threw a filesystem_error\n"
