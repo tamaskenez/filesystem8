@@ -884,12 +884,10 @@ namespace detail
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
-#ifdef FILESYSTEM_TODO
-
   class directory_iterator
-    : public boost::iterator_facade< directory_iterator,
+    : public iterator_facade< directory_iterator,
                                      directory_entry,
-                                     boost::single_pass_traversal_tag >
+                                     std::forward_iterator_tag >
   {
   public:
 
@@ -914,6 +912,9 @@ namespace detail
     }
 
   private:
+    friend class iterator_facade< directory_iterator,
+                                     directory_entry,
+                                     std::forward_iterator_tag >;
     friend struct detail::dir_itr_imp;
     friend BOOST_FILESYSTEM_DECL void detail::directory_iterator_construct(directory_iterator& it,
       const path& p, std::error_code* ec);
@@ -924,12 +925,7 @@ namespace detail
     // m_imp.get()==0 indicates the end iterator.
     std::shared_ptr< detail::dir_itr_imp >  m_imp;
 
-    friend class boost::iterator_core_access;
-
-    boost::iterator_facade<
-      directory_iterator,
-      directory_entry,
-      boost::single_pass_traversal_tag >::reference dereference() const 
+    reference dereference() const
     {
       BOOST_ASSERT_MSG(m_imp.get(), "attempt to dereference end iterator");
       return m_imp->dir_entry;
@@ -966,23 +962,8 @@ namespace detail
   directory_iterator range_end(const directory_iterator&) BOOST_NOEXCEPT
     {return directory_iterator();}
 
-#endif // FILESYSTEM_TODO
-
   }  // namespace filesystem
 
-#ifdef FILESYSTEM_TODO
-
-  //  namespace boost template specializations
-  template<>
-  struct range_mutable_iterator<boost::filesystem::directory_iterator>
-    { typedef boost::filesystem::directory_iterator type; };
-  template<>
-  struct range_const_iterator <boost::filesystem::directory_iterator>
-    { typedef boost::filesystem::directory_iterator type; };
-
-#endif // FILESYSTEM_TODO
-
-#ifdef FILESYSTEM_TODO
 
 namespace filesystem
 {
@@ -1144,10 +1125,10 @@ namespace filesystem
 //--------------------------------------------------------------------------------------//
 
   class recursive_directory_iterator
-    : public boost::iterator_facade<
+    : public iterator_facade<
         recursive_directory_iterator,
         directory_entry,
-        boost::single_pass_traversal_tag >
+        std::forward_iterator_tag >
   {
   public:
 
@@ -1262,16 +1243,16 @@ namespace filesystem
 
   private:
 
+    friend class iterator_facade<
+        recursive_directory_iterator,
+        directory_entry,
+        std::forward_iterator_tag >;
+
     // shared_ptr provides shallow-copy semantics required for InputIterators.
     // m_imp.get()==0 indicates the end iterator.
     std::shared_ptr< detail::recur_dir_itr_imp >  m_imp;
 
-    friend class boost::iterator_core_access;
-
-    boost::iterator_facade< 
-      recursive_directory_iterator,
-      directory_entry,
-      boost::single_pass_traversal_tag >::reference
+    reference
     dereference() const 
     {
       BOOST_ASSERT_MSG(m_imp.get(),
@@ -1321,18 +1302,6 @@ namespace filesystem
                                                   {return recursive_directory_iterator();}
   }  // namespace filesystem
 
-  //  namespace boost template specializations
-  template<>
-  struct range_mutable_iterator<boost::filesystem::recursive_directory_iterator>
-                        { typedef boost::filesystem::recursive_directory_iterator type; };
-  template<>
-  struct range_const_iterator <boost::filesystem::recursive_directory_iterator>
-                        { typedef boost::filesystem::recursive_directory_iterator type; };
-
-#endif // FILESYSTEM_TODO
-
-#ifdef FILESYSTEM_TODO
-
 namespace filesystem
 {
 
@@ -1351,8 +1320,6 @@ namespace filesystem
     BOOST_FILESYSTEM_DECL bool possible_large_file_size_support();
   }
   } // namespace filesystem
-
-#endif // FILESYSTEM_TODO
 
 } // namespace boost
 

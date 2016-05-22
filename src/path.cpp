@@ -170,12 +170,10 @@ namespace filesystem
     return *this;
   }
 
-#ifdef FILESYSTEM_TODO
   int path::compare(const path& p) const BOOST_NOEXCEPT
   {
     return detail::lex_compare(begin(), end(), p.begin(), p.end());
   }
-#endif
 
 # ifdef BOOST_WINDOWS_API
 
@@ -280,7 +278,6 @@ namespace filesystem
     return temp;
   } 
 
-#ifdef FILESYSTEM_TODO
   path path::root_name() const
   {
     iterator itr(begin());
@@ -298,7 +295,7 @@ namespace filesystem
       ? itr.m_element
       : path();
   }
-#endif
+
   path path::root_directory() const
   {
     size_type pos(root_directory_start(m_pathname, m_pathname.size()));
@@ -308,7 +305,6 @@ namespace filesystem
       : path(string_type(m_pathname.c_str() + pos, m_pathname.c_str() + pos + 1));
   }
 
-#if FILESYSTEM_TODO
   path path::relative_path() const
   {
     iterator itr(begin());
@@ -322,7 +318,7 @@ namespace filesystem
 
     return path(m_pathname.c_str() + itr.m_pos);
   }
-#endif
+
   string_type::size_type path::m_parent_path_end() const
   {
     size_type end_pos(filename_pos(m_pathname, m_pathname.size()));
@@ -385,7 +381,6 @@ namespace filesystem
 
   //  lexical operations  --------------------------------------------------------------//
 
-#ifdef FILESYSTEM_TODO
   namespace detail
   {
     // C++14 provide a mismatch algorithm with four iterator arguments(), but earlier
@@ -402,8 +397,7 @@ namespace filesystem
       return std::make_pair(it1, it2);
     }
   }
-#endif
-#ifdef FILESYSTEM_TODO
+
   path path::lexically_relative(const path& base) const
   {
     std::pair<path::iterator, path::iterator> mm
@@ -492,7 +486,6 @@ namespace filesystem
       temp /= detail::dot_path();
     return temp;
   }
-#endif
 }  // namespace filesystem
 }  // namespace boost
   
@@ -685,7 +678,6 @@ namespace filesystem
 {
   namespace detail
   {
-#ifdef FILESYSTEM_TODO
 
     BOOST_FILESYSTEM_DECL
       int lex_compare(path::iterator first1, path::iterator last1,
@@ -704,7 +696,6 @@ namespace filesystem
       return first1 == last1 ? -1 : 1;
     }
 
-#endif
 
     BOOST_FILESYSTEM_DECL
     const path&  dot_path()
@@ -734,7 +725,6 @@ namespace filesystem
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
-#ifdef FILESYSTEM_TODO
   path::iterator path::begin() const
   {
     iterator itr;
@@ -848,6 +838,5 @@ namespace filesystem
     if (it.m_element.m_pathname == preferred_separator_string) // needed for Windows, harmless on POSIX 
       it.m_element.m_pathname = separator_string;    // generic format; see docs 
   }
-#endif
 }  // namespace filesystem
 }  // namespace boost

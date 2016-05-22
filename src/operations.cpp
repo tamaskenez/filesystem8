@@ -258,9 +258,8 @@ namespace
 
   fs::file_type query_file_type(const path& p, error_code* ec);
 
-#ifdef FILESYSTEM_TODO
   boost::filesystem::directory_iterator end_dir_itr;
-#endif
+
   //  error handling helpers  ----------------------------------------------------------//
 
   bool error(err_t error_num, error_code* ec, const char* message);
@@ -328,12 +327,10 @@ namespace
 
   //  general helpers  -----------------------------------------------------------------//
 
-#ifdef FILESYSTEM_TODO
   bool is_empty_directory(const path& p)
   {
     return fs::directory_iterator(p)== end_dir_itr;
   }
-#endif
 
   bool not_found_error(int errval); // forward declaration
 
@@ -380,7 +377,6 @@ namespace
     return true;
   }
 
-#ifdef FILESYSTEM_TODO
   std::uintmax_t remove_all_aux(const path& p, fs::file_type type,
     error_code* ec)
   {
@@ -400,7 +396,6 @@ namespace
     remove_file_or_directory(p, type, ec);
     return count;
   }
-#endif
 
 #ifdef BOOST_POSIX_API
 
@@ -795,7 +790,6 @@ namespace detail
 #   endif
   }
 
-#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   path canonical(const path& p, const path& base, std::error_code* ec)
   {
@@ -877,7 +871,7 @@ namespace detail
     BOOST_ASSERT_MSG(result.is_absolute(), "canonical() implementation error; please report");
     return result;
   }
-#endif
+
   BOOST_FILESYSTEM_DECL
   void copy(const path& from, const path& to, std::error_code* ec)
   {
@@ -1293,7 +1287,6 @@ namespace detail
       return init_path;
   }
 
-#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   bool is_empty(const path& p, std::error_code* ec)
   {
@@ -1320,7 +1313,6 @@ namespace detail
         : (!fad.nFileSizeHigh && !fad.nFileSizeLow);
 #   endif
   }
-#endif
 
   BOOST_FILESYSTEM_DECL
   std::time_t last_write_time(const path& p, std::error_code* ec)
@@ -1574,7 +1566,6 @@ namespace detail
     return remove_file_or_directory(p, type, ec);
   }
 
-#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   std::uintmax_t remove_all(const path& p, error_code* ec)
   {
@@ -1588,7 +1579,7 @@ namespace detail
       ? remove_all_aux(p, type, ec)
       : 0;
   }
-#endif
+
   BOOST_FILESYSTEM_DECL
   void rename(const path& old_p, const path& new_p, error_code* ec)
   {
@@ -1896,7 +1887,6 @@ namespace detail
 #   endif
   }
 
-#ifdef FILESYSTEM_TODO
   BOOST_FILESYSTEM_DECL
   path weakly_canonical(const path& p, std::error_code* ec)
   {
@@ -1938,7 +1928,6 @@ namespace detail
           ? (head/tail).lexically_normal()  
           : head/tail);
   }
-#endif
 }  // namespace detail
 
 //--------------------------------------------------------------------------------------//
@@ -2237,7 +2226,6 @@ namespace detail
 #   endif
   }
 
-#ifdef FILESYSTEM_TODO
   void directory_iterator_construct(directory_iterator& it,
     const path& p, std::error_code* ec)    
   {
@@ -2323,7 +2311,6 @@ namespace detail
       }
     }
   }
-#endif
 }  // namespace detail
 } // namespace filesystem
 } // namespace boost

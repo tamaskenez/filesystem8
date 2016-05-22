@@ -356,16 +356,60 @@ namespace filesystem
   //                             class path::iterator                                   //
   //------------------------------------------------------------------------------------//
  
-#ifdef FILESYSTEM_TODO
+  template <class IT, class V, class C>
+  class iterator_facade
+    : public std::iterator<C,V>
+  {
+  public:
+    using base_t = std::iterator<C, V>;
+    using reference = typename base_t::reference;
+    using pointer = typename base_t::pointer;
+
+    bool operator==(const IT& it) const {
+        return static_cast<const IT*>(this)->equal(it);
+    }
+    bool operator!=(const IT& it) const {
+        return !static_cast<const IT*>(this)->equal(it);
+    }
+    IT& operator++() {
+        auto that = static_cast<IT*>(this);
+        that->increment();
+        return *that;
+    }
+    IT& operator--() {
+        auto that = static_cast<IT*>(this);
+        that->decrement();
+        return *that;
+    }
+    IT operator++(int) {
+        auto that = static_cast<IT*>(this);
+        IT tmp(*that);
+        that->increment();
+        return tmp;
+    }
+    IT operator--(int) {
+        auto that = static_cast<IT*>(this);
+        IT tmp(*that);
+        that->decrement();
+        return tmp;
+    }
+    reference operator*() {
+        auto that = static_cast<IT*>(this);
+        return that->dereference();
+    }
+    pointer operator->() {
+        auto that = static_cast<IT*>(this);
+        return &that->dereference();
+    }
+  };
 
   class path::iterator
-    : public boost::iterator_facade<
-      path::iterator,
-      path const,
-      boost::bidirectional_traversal_tag >
+    : public iterator_facade<
+      path::iterator, path const,
+      std::bidirectional_iterator_tag>
   {
   private:
-    friend class boost::iterator_core_access;
+    friend class iterator_facade<path::iterator, path const, std::bidirectional_iterator_tag>;
     friend class boost::filesystem::path;
     friend class boost::filesystem::path::reverse_iterator;
     friend void m_path_iterator_increment(path::iterator & it);
@@ -398,20 +442,18 @@ namespace filesystem
   //------------------------------------------------------------------------------------//
  
   class path::reverse_iterator
-    : public boost::iterator_facade<
-      path::reverse_iterator,
-      path const,
-      boost::bidirectional_traversal_tag >
+    : public iterator_facade<
+      path::reverse_iterator, path const,
+      std::bidirectional_iterator_tag>
   {
   public:
 
-    explicit reverse_iterator(iterator itr) : m_itr(itr)
+    explicit reverse_iterator(path::iterator itr) : m_itr(itr)
     {
       if (itr != itr.m_path_ptr->begin())
         m_element = *--itr;
     }
   private:
-    friend class boost::iterator_core_access;
     friend class boost::filesystem::path;
 
     const path& dereference() const { return m_element; }
@@ -421,7 +463,7 @@ namespace filesystem
       --m_itr;
       if (m_itr != m_itr.m_path_ptr->begin())
       {
-        iterator tmp = m_itr;
+        path::iterator tmp = m_itr;
         m_element = *--tmp;
       }
     }
@@ -431,7 +473,7 @@ namespace filesystem
       ++m_itr;
     }
 
-    iterator m_itr;
+    path::iterator m_itr;
     path     m_element;
 
   }; // path::reverse_iterator
@@ -451,7 +493,7 @@ namespace filesystem
   inline bool lexicographical_compare(path::iterator first1, path::iterator last1,
     path::iterator first2, path::iterator last2)
     { return detail::lex_compare(first1, last1, first2, last2) < 0; }
-#endif
+
   inline bool operator==(const path& lhs, const path& rhs)              {return lhs.compare(rhs) == 0;}
   inline bool operator==(const path& lhs, const path::string_type& rhs) {return lhs.compare(rhs) == 0;} 
   inline bool operator==(const path::string_type& lhs, const path& rhs) {return rhs.compare(lhs) == 0;}
@@ -471,7 +513,26 @@ namespace filesystem
   inline bool operator> (const path& lhs, const path& rhs) {return rhs < lhs;}
   inline bool operator>=(const path& lhs, const path& rhs) {return !(lhs < rhs);}
 
-#ifdef FILESYTEM_TODO
+  template<class T>
+  std::size_t hash_value(const T&);
+
+  template<> std::size_t hash_value(const std::size_t& x) {
+    return x;
+  }
+
+  template<class T>
+  inline void hash_combine(std::size_t & seed, const T& v)
+  {
+    seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  }
+
+  template<typename It> std::size_t hash_range(It first, It last) {
+    size_t seed = 0;
+    for(; first != last; ++first)
+      hash_combine(seed, *first);
+    return seed;
+  }
+
   inline std::size_t hash_value(const path& x)
   {
 # ifdef BOOST_WINDOWS_API
@@ -483,7 +544,7 @@ namespace filesystem
     return hash_range(x.native().begin(), x.native().end());
 # endif
   }
-#endif
+
   inline void swap(path& lhs, path& rhs)                   { lhs.swap(rhs); }
 
   inline path operator/(const path& lhs, const path& rhs)  { return path(lhs) /= rhs; }
