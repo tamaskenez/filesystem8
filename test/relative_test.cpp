@@ -13,7 +13,6 @@
 //
 //  ----------------------------------------------------------------------------------  //
 
-#include <boost/config/warning_disable.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/detail/lightweight_test_report.hpp>
 #include <iostream>

@@ -12,3 +12,11 @@ if(BOOST_HAS_UNISTD_H)
 endif()
 
 add_subdirectory(src)
+
+if(NOT CMAKE_CROSSCOMPILING)
+    enable_testing()
+endif()
+
+if(NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
+    add_subdirectory(test)
+endif()
