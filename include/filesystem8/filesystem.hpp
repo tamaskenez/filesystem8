@@ -9,13 +9,12 @@
 
 //--------------------------------------------------------------------------------------// 
 
-#ifndef BOOST_FILESYSTEM_FILESYSTEM_HPP
-#define BOOST_FILESYSTEM_FILESYSTEM_HPP
+#ifndef FILESYSTEM8_FILESYSTEM_HPP
+#define FILESYSTEM8_FILESYSTEM_HPP
 
 #  include <filesystem8/config.hpp>
 #  include <filesystem8/path.hpp>
 #  include <filesystem8/operations.hpp>
-#  include <filesystem8/convenience.hpp>
 #  include <filesystem8/string_file.hpp>
 
-#endif  // BOOST_FILESYSTEM_FILESYSTEM_HPP 
+#endif  // FILESYSTEM8_FILESYSTEM_HPP 

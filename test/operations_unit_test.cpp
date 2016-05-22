@@ -347,8 +347,8 @@ int cpp_main(int, char*[])
 #ifdef BOOST_WINDOWS_API
   cout << "BOOST_WINDOWS_API is defined\n";
 #endif
-  cout << "BOOST_FILESYSTEM_DECL" << BOOST_STRINGIZE(=BOOST_FILESYSTEM_DECL) << "\n";
-  cout << "BOOST_SYMBOL_VISIBLE" << BOOST_STRINGIZE(=BOOST_SYMBOL_VISIBLE) << "\n";
+  cout << "FILESYSTEM8_EXPORT" << BOOST_STRINGIZE(=FILESYSTEM8_EXPORT) << "\n";
+  cout << "FILESYSTEM8_EXPORT" << BOOST_STRINGIZE(=FILESYSTEM8_EXPORT) << "\n";
   
   cout << "current_path() is " << current_path().string() << endl;
 

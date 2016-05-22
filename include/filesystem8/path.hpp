@@ -12,14 +12,8 @@
 //  basename(), extension(), and change_extension() from the original
 //  filesystem/convenience.hpp header by Vladimir Prus.
 
-#ifndef BOOST_FILESYSTEM_PATH_HPP
-#define BOOST_FILESYSTEM_PATH_HPP
-
-#include <boost/config.hpp>
-
-# if defined( BOOST_NO_STD_WSTRING )
-#   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
-# endif
+#ifndef FILESYSTEM8_PATH_HPP
+#define FILESYSTEM8_PATH_HPP
 
 #include <filesystem8/config.hpp>
 #include <system_error>
@@ -46,19 +40,19 @@ namespace filesystem
   //                                                                                    //
   //------------------------------------------------------------------------------------//
 
-  class BOOST_FILESYSTEM_DECL path
+  class FILESYSTEM8_EXPORT path
   {
   public:
 
     //  value_type is the character type used by the operating system API to
     //  represent paths.
 
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
     typedef char                           value_type;
-    BOOST_STATIC_CONSTEXPR value_type      preferred_separator = '\\';
+    FILESYSTEM8_STATIC_CONSTEXPR value_type      preferred_separator = '\\';
 # else 
     typedef char                           value_type;
-    BOOST_STATIC_CONSTEXPR value_type      preferred_separator = '/';
+    FILESYSTEM8_STATIC_CONSTEXPR value_type      preferred_separator = '/';
 # endif
     typedef std::basic_string<value_type>  string_type;  
 
@@ -120,7 +114,7 @@ namespace filesystem
 
     //  -----  constructors  -----
 
-    path() BOOST_NOEXCEPT {}                                          
+    path() FILESYSTEM8_NOEXCEPT {}                                          
     path(const path& p) : m_pathname(p.m_pathname) {}
 
     path(const value_type* s) : m_pathname(s) {}
@@ -131,8 +125,8 @@ namespace filesystem
   //  functions. GCC is not even consistent for the same release on different platforms.
 
 # if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-    path(path&& p) BOOST_NOEXCEPT { m_pathname = std::move(p.m_pathname); }
-    path& operator=(path&& p) BOOST_NOEXCEPT
+    path(path&& p) FILESYSTEM8_NOEXCEPT { m_pathname = std::move(p.m_pathname); }
+    path& operator=(path&& p) FILESYSTEM8_NOEXCEPT
       { m_pathname = std::move(p.m_pathname); return *this; }
     path(string_type&& s) : m_pathname(std::move(s)) {}
     path& operator=(string_type&& s) {m_pathname = std::move(s); return *this;}
@@ -178,17 +172,17 @@ namespace filesystem
 
     //  -----  modifiers  -----
 
-    void   clear() BOOST_NOEXCEPT             { m_pathname.clear(); }
+    void   clear() FILESYSTEM8_NOEXCEPT             { m_pathname.clear(); }
     path&  make_preferred()
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
       { return *this; }  // POSIX no effect
-#   else // BOOST_WINDOWS_API
+#   else // FILESYSTEM8_WINDOWS_API
       ;  // change slashes to backslashes
 #   endif
     path&  remove_filename();
     path&  remove_trailing_separator();
     path&  replace_extension(const path& new_extension = path());
-    void   swap(path& rhs) BOOST_NOEXCEPT     { m_pathname.swap(rhs.m_pathname); }
+    void   swap(path& rhs) FILESYSTEM8_NOEXCEPT     { m_pathname.swap(rhs.m_pathname); }
 
     //  -----  observers  -----
   
@@ -211,9 +205,9 @@ namespace filesystem
 
     //  -----  native format observers  -----
 
-    const string_type&  native() const BOOST_NOEXCEPT  { return m_pathname; }
-    const value_type*   c_str() const BOOST_NOEXCEPT   { return m_pathname.c_str(); }
-    string_type::size_type size() const BOOST_NOEXCEPT { return m_pathname.size(); }
+    const string_type&  native() const FILESYSTEM8_NOEXCEPT  { return m_pathname; }
+    const value_type*   c_str() const FILESYSTEM8_NOEXCEPT   { return m_pathname.c_str(); }
+    string_type::size_type size() const FILESYSTEM8_NOEXCEPT { return m_pathname.size(); }
 
     //  string_type is std::string, so there is no conversion
     const std::string&  string() const { return m_pathname; }
@@ -223,10 +217,10 @@ namespace filesystem
     //  Experimental generic function returning generic formatted path (i.e. separators
     //  are forward slashes). Motivation: simpler than a family of generic_*string
     //  functions.
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
     const std::string   generic_string() const; 
 
-#   else // BOOST_POSIX_API
+#   else // FILESYSTEM8_POSIX_API
     //  On POSIX-like systems, the generic format is the same as the native format
     const std::string&  generic_string() const  { return m_pathname; }
 
@@ -234,7 +228,7 @@ namespace filesystem
 
     //  -----  compare  -----
 
-    int compare(const path& p) const BOOST_NOEXCEPT;  // generic, lexicographical
+    int compare(const path& p) const FILESYSTEM8_NOEXCEPT;  // generic, lexicographical
     int compare(const std::string& s) const { return compare(path(s)); }
     int compare(const value_type* s) const  { return compare(path(s)); }
 
@@ -252,7 +246,7 @@ namespace filesystem
 
     //  -----  query  -----
 
-    bool empty() const BOOST_NOEXCEPT{ return m_pathname.empty(); }
+    bool empty() const FILESYSTEM8_NOEXCEPT{ return m_pathname.empty(); }
     bool has_root_path() const       { return has_root_directory() || has_root_name(); }
     bool has_root_name() const       { return !root_name().empty(); }
     bool has_root_directory() const  { return !root_directory().empty(); }
@@ -264,7 +258,7 @@ namespace filesystem
     bool is_relative() const         { return !is_absolute(); } 
     bool is_absolute() const
     {
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
       return has_root_name() && has_root_directory();
 #     else
       return has_root_directory();
@@ -339,18 +333,14 @@ namespace filesystem
 
   namespace detail
   {
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
       int lex_compare(path::iterator first1, path::iterator last1,
         path::iterator first2, path::iterator last2);
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
       const path&  dot_path();
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
       const path&  dot_dot_path();
   }
-
-# ifndef BOOST_FILESYSTEM_NO_DEPRECATED
-  typedef path wpath;
-# endif
 
   //------------------------------------------------------------------------------------//
   //                             class path::iterator                                   //
@@ -535,12 +525,12 @@ namespace filesystem
 
   inline std::size_t hash_value(const path& x)
   {
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
     std::size_t seed = 0;
     for(const path::value_type* it = x.c_str(); *it; ++it)
       hash_combine(seed, *it == '/' ? L'\\' : *it);
     return seed;
-# else   // BOOST_POSIX_API
+# else   // FILESYSTEM8_POSIX_API
     return hash_range(x.native().begin(), x.native().end());
 # endif
   }
@@ -580,4 +570,4 @@ namespace filesystem
 
 //----------------------------------------------------------------------------//
 
-#endif  // BOOST_FILESYSTEM_PATH_HPP
+#endif  // FILESYSTEM8_PATH_HPP

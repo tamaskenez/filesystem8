@@ -32,7 +32,7 @@
 #include <cstring>
 #include <cassert>
 
-#ifdef BOOST_WINDOWS_API
+#ifdef FILESYSTEM8_WINDOWS_API
 # include <windows.h>
 #endif
 
@@ -66,7 +66,7 @@ namespace
   typedef path::string_type       string_type;
   typedef string_type::size_type  size_type;
 
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
 
   const wchar_t separator = L'/';
   const wchar_t* const separators = L"/\\";
@@ -94,7 +94,7 @@ namespace
   inline bool is_separator(fs::path::value_type c)
   {
     return c == separator
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
       || c == path::preferred_separator
 #     endif
       ;
@@ -170,12 +170,12 @@ namespace filesystem
     return *this;
   }
 
-  int path::compare(const path& p) const BOOST_NOEXCEPT
+  int path::compare(const path& p) const FILESYSTEM8_NOEXCEPT
   {
     return detail::lex_compare(begin(), end(), p.begin(), p.end());
   }
 
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
 
   const std::string path::generic_string() const
   {
@@ -198,14 +198,14 @@ namespace filesystem
     return tmp.wstring();
   }
 
-# endif  // BOOST_WINDOWS_API
+# endif  // FILESYSTEM8_WINDOWS_API
 
   //  m_append_separator_if_needed  ----------------------------------------------------//
 
   path::string_type::size_type path::m_append_separator_if_needed()
   {
     if (!m_pathname.empty() &&
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
       *(m_pathname.end()-1) != colon && 
 #     endif
       !is_separator(*(m_pathname.end()-1)))
@@ -224,7 +224,7 @@ namespace filesystem
     if (sep_pos                         // a separator was added
       && sep_pos < m_pathname.size()         // and something was appended
       && (m_pathname[sep_pos+1] == separator // and it was also separator
-#      ifdef BOOST_WINDOWS_API
+#      ifdef FILESYSTEM8_WINDOWS_API
        || m_pathname[sep_pos+1] == preferred_separator  // or preferred_separator
 #      endif
 )) { m_pathname.erase(sep_pos, 1); } // erase the added separator
@@ -232,7 +232,7 @@ namespace filesystem
 
   //  modifiers  -----------------------------------------------------------------------//
 
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
   path & path::make_preferred()
   {
     std::replace(m_pathname.begin(), m_pathname.end(), L'/', L'\\');
@@ -288,7 +288,7 @@ namespace filesystem
             && is_separator(itr.m_element.m_pathname[0])
             && is_separator(itr.m_element.m_pathname[1])
    )
-#       ifdef BOOST_WINDOWS_API
+#       ifdef FILESYSTEM8_WINDOWS_API
         || itr.m_element.m_pathname[itr.m_element.m_pathname.size()-1] == colon
 #       endif
   ))
@@ -311,7 +311,7 @@ namespace filesystem
 
     for (; itr.m_pos != m_pathname.size()
       && (is_separator(itr.m_element.m_pathname[0])
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
       || itr.m_element.m_pathname[itr.m_element.m_pathname.size()-1] == colon
 #     endif
     ); ++itr) {}
@@ -447,7 +447,7 @@ namespace filesystem
           && (lf.size() != 2 
             || (lf[0] != dot
               && lf[1] != dot
-#             ifdef BOOST_WINDOWS_API
+#             ifdef FILESYSTEM8_WINDOWS_API
               && lf[1] != colon
 #             endif
                )
@@ -503,7 +503,7 @@ namespace
   bool is_root_separator(const string_type & str, size_type pos)
     // pos is position of the separator
   {
-    BOOST_ASSERT_MSG(!str.empty() && is_separator(str[pos]),
+    FILESYSTEM8_ASSERT_MSG(!str.empty() && is_separator(str[pos]),
       "precondition violation");
 
     // subsequent logic expects pos to be for leftmost slash of a set
@@ -514,7 +514,7 @@ namespace
     if (pos == 0)  
       return true;
 
-# ifdef BOOST_WINDOWS_API
+# ifdef FILESYSTEM8_WINDOWS_API
     //  "c:/" [...]
     if (pos == 2 && is_letter(str[0]) && str[1] == colon)  
       return true;
@@ -545,7 +545,7 @@ namespace
     // set pos to start of last element
     size_type pos(str.find_last_of(separators, end_pos-1));
 
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
     if (pos == string_type::npos && end_pos > 1)
       pos = str.find_last_of(colon, end_pos-2);
 #   endif
@@ -562,7 +562,7 @@ namespace
   // return npos if no root_directory found
   {
 
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
     // case "c:/"
     if (size > 2
       && path[1] == colon
@@ -574,7 +574,7 @@ namespace
       && is_separator(path[0])
       && is_separator(path[1])) return string_type::npos;
 
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
     // case "\\?\"
     if (size > 4
       && is_separator(path[0])
@@ -650,7 +650,7 @@ namespace
 
     // find the end
     while (cur < size
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
       && src[cur] != colon
 #     endif
       && !is_separator(src[cur]))
@@ -659,7 +659,7 @@ namespace
       ++element_size;
     }
 
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
     if (cur == size) return;
     // include device delimiter
     if (src[cur] == colon)
@@ -679,7 +679,7 @@ namespace filesystem
   namespace detail
   {
 
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
       int lex_compare(path::iterator first1, path::iterator last1,
         path::iterator first2, path::iterator last2)
     {
@@ -687,7 +687,7 @@ namespace filesystem
       {
         if (first1->native() < first2->native()) return -1;
         if (first2->native() < first1->native()) return 1;
-        BOOST_ASSERT(first2->native() == first1->native());
+        FILESYSTEM8_ASSERT(first2->native() == first1->native());
         ++first1;
         ++first2;
       }
@@ -697,10 +697,10 @@ namespace filesystem
     }
 
 
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
     const path&  dot_path()
     {
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
       static const fs::path dot_pth(L".");
 #   else
       static const fs::path dot_pth(".");
@@ -708,10 +708,10 @@ namespace filesystem
       return dot_pth;
     }
 
-    BOOST_FILESYSTEM_DECL
+    FILESYSTEM8_EXPORT
     const path&  dot_dot_path()
     {
-#   ifdef BOOST_WINDOWS_API
+#   ifdef FILESYSTEM8_WINDOWS_API
       static const fs::path dot_dot(L"..");
 #   else
       static const fs::path dot_dot("..");
@@ -747,7 +747,7 @@ namespace filesystem
 
   void path::m_path_iterator_increment(path::iterator & it)
   {
-    BOOST_ASSERT_MSG(it.m_pos < it.m_path_ptr->m_pathname.size(),
+    FILESYSTEM8_ASSERT_MSG(it.m_pos < it.m_path_ptr->m_pathname.size(),
       "path::basic_iterator increment past end()");
 
     // increment to position past current element; if current element is implicit dot,
@@ -772,7 +772,7 @@ namespace filesystem
     {
       // detect root directory
       if (was_net
-#       ifdef BOOST_WINDOWS_API
+#       ifdef FILESYSTEM8_WINDOWS_API
         // case "c:/"
         || it.m_element.m_pathname[it.m_element.m_pathname.size()-1] == colon
 #       endif
@@ -806,7 +806,7 @@ namespace filesystem
 
   void path::m_path_iterator_decrement(path::iterator & it)
   {
-    BOOST_ASSERT_MSG(it.m_pos, "path::iterator decrement past begin()");
+    FILESYSTEM8_ASSERT_MSG(it.m_pos, "path::iterator decrement past begin()");
 
     size_type end_pos(it.m_pos);
 

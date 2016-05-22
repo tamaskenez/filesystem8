@@ -7,11 +7,10 @@
 
 //  Library home page: http://www.boost.org/libs/filesystem
 
-#ifndef BOOST_FILESYSTEM_STRING_FILE_HPP
-#define BOOST_FILESYSTEM_STRING_FILE_HPP
+#ifndef FILESYSTEM8_STRING_FILE_HPP
+#define FILESYSTEM8_STRING_FILE_HPP
 
 #include <string>
-#include <filesystem8/fstream.hpp>
 #include <filesystem8/operations.hpp>
 
 namespace boost

@@ -9,36 +9,35 @@
 
 //--------------------------------------------------------------------------------------// 
 
-#ifndef BOOST_FILESYSTEM3_CONFIG_HPP
-#define BOOST_FILESYSTEM3_CONFIG_HPP
+#ifndef FILESYSTEM8_CONFIG_HPP
+#define FILESYSTEM8_CONFIG_HPP
 
 #include <filesystem8/export.h>
-#undef BOOST_FILESYSTEM_DEPRECATED
-#define BOOST_FILESYSTEM_DECL BOOST_FILESYSTEM_EXPORT
-#define BOOST_SYMBOL_VISIBLE BOOST_FILESYSTEM_EXPORT
 
-#define BOOST_CONSTEXPR_OR_CONST constexpr
-#define BOOST_STATIC_CONSTEXPR static BOOST_CONSTEXPR_OR_CONST
-#define BOOST_NOEXCEPT noexcept
-#define BOOST_NOEXCEPT_OR_NOTHROW noexcept
-
-
-#define BOOST_SCOPED_ENUM_START(X) enum class X
-#define BOOST_SCOPED_ENUM_END
-#define BOOST_SCOPED_ENUM(X) X
-
-#define BOOST_ASSERT(C) (C?(void)0:std::terminate())
-#define BOOST_ASSERT_MSG(C,M) (C?(void)0:std::terminate())
-#define BOOST_FILESYSTEM_I18N  // aid users wishing to compile several versions
-
-#ifdef _WIN32
-#define BOOST_WINDOWS_API
+#if __cplusplus > 201100 || _MSC_VER >= 1900
+#define FILESYSTEM8_CONSTEXPR_OR_CONST constexpr
+#define FILESYSTEM8_NOEXCEPT noexcept
+#define FILESYSTEM8_NOEXCEPT_OR_NOTHROW noexcept
 #else
-#define BOOST_POSIX_API
+#define FILESYSTEM8_CONSTEXPR_OR_CONST const
+#define FILESYSTEM8_NOEXCEPT
+#define FILESYSTEM8_NOEXCEPT_OR_NOTHROW throw()
 #endif
 
-#define BOOST_FILESYSTEM_THROW(EX) throw EX
+#define FILESYSTEM8_STATIC_CONSTEXPR static FILESYSTEM8_CONSTEXPR_OR_CONST
 
-namespace boost { namespace filesystem {}}
 
-#endif // BOOST_FILESYSTEM3_CONFIG_HPP
+#define FILESYSTEM8_ASSERT(C) (C?(void)0:std::terminate())
+#define FILESYSTEM8_ASSERT_MSG(C,M) (C?(void)0:std::terminate())
+
+#ifdef _WIN32
+#define FILESYSTEM8_WINDOWS_API
+#else
+#define FILESYSTEM8_POSIX_API
+#endif
+
+#define FILESYSTEM8_THROW(EX) throw EX
+
+namespace filesystem8 {}
+
+#endif // FILESYSTEM8_CONFIG_HPP

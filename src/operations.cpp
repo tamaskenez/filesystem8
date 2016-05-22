@@ -29,14 +29,6 @@
 #define _FILE_OFFSET_BITS 64
 #endif
 
-// define BOOST_FILESYSTEM_SOURCE so that <filesystem8/config.hpp> knows
-// the library is being built (possibly exporting rather than importing code)
-#define BOOST_FILESYSTEM_SOURCE 
-
-#ifndef BOOST_SYSTEM_NO_DEPRECATED 
-# define BOOST_SYSTEM_NO_DEPRECATED
-#endif
-
 #ifndef _POSIX_PTHREAD_SEMANTICS
 # define _POSIX_PTHREAD_SEMANTICS  // Sun readdir_r()needs this
 #endif
@@ -66,7 +58,7 @@ using std::system_category;
 using std::string;
 using std::wstring;
 
-# ifdef BOOST_POSIX_API
+# ifdef FILESYSTEM8_POSIX_API
 
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -182,14 +174,14 @@ inline std::wstring wgetenv(const wchar_t* name)
     ? std::wstring() : std::wstring(&buf[0]);
 }
 
-# endif  // BOOST_WINDOWS_API
+# endif  // FILESYSTEM8_WINDOWS_API
 
 //  BOOST_FILESYSTEM_STATUS_CACHE enables file_status cache in
 //  dir_itr_increment. The config tests are placed here because some of the
 //  macros being tested come from dirent.h.
 //
 // TODO: find out what macros indicate dirent::d_type present in more libraries
-# if defined(BOOST_WINDOWS_API)\
+# if defined(FILESYSTEM8_WINDOWS_API)\
   || defined(_DIRENT_HAVE_D_TYPE)// defined by GNU C library if d_type present
 #   define BOOST_FILESYSTEM_STATUS_CACHE
 # endif
@@ -203,7 +195,7 @@ inline std::wstring wgetenv(const wchar_t* name)
 //  order of arguments, and meaning of return were followed initially, but
 //  found to be less clear and cause more coding errors.]
 
-# if defined(BOOST_POSIX_API)
+# if defined(FILESYSTEM8_POSIX_API)
 
 typedef int err_t;
 
@@ -224,7 +216,7 @@ typedef int err_t;
 #   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
 #   define BOOST_ERROR_ALREADY_EXISTS EEXIST
 
-# else  // BOOST_WINDOWS_API
+# else  // FILESYSTEM8_WINDOWS_API
 
 typedef DWORD err_t;
 
@@ -282,7 +274,7 @@ namespace
     else  
     { //  error
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error(message,
+        FILESYSTEM8_THROW(filesystem_error(message,
           error_code(error_num, system_category())));
       else
         ec->assign(error_num, system_category());
@@ -299,7 +291,7 @@ namespace
     else  
     { //  error
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error(message,
+        FILESYSTEM8_THROW(filesystem_error(message,
           p, error_code(error_num, system_category())));
       else
         ec->assign(error_num, system_category());
@@ -317,7 +309,7 @@ namespace
     else  
     { //  error
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error(message,
+        FILESYSTEM8_THROW(filesystem_error(message,
           p1, p2, error_code(error_num, system_category())));
       else
         ec->assign(error_num, system_category());
@@ -359,7 +351,7 @@ namespace
     }
 
     if (type == fs::directory_file
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
         || type == fs::_detail_directory_symlink
 #     endif
       )
@@ -397,7 +389,7 @@ namespace
     return count;
   }
 
-#ifdef BOOST_POSIX_API
+#ifdef FILESYSTEM8_POSIX_API
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -439,7 +431,7 @@ namespace
     if ((outfile = ::open(to_p.c_str(), oflag, from_stat.st_mode))< 0)
     {
       int open_errno = errno;
-      BOOST_ASSERT(infile >= 0);
+      FILESYSTEM8_ASSERT(infile >= 0);
       ::close(infile);
       errno = open_errno;
       return false;
@@ -454,10 +446,10 @@ namespace
       sz_write = 0;
       do
       {
-        BOOST_ASSERT(sz_read - sz_write > 0);  // #1
+        FILESYSTEM8_ASSERT(sz_read - sz_write > 0);  // #1
           // ticket 4438 claimed possible infinite loop if write returns 0. My analysis
           // is that POSIX specifies 0 return only if 3rd arg is 0, and that will never
-          // happen due to loop entry and coninuation conditions. BOOST_ASSERT #1 above
+          // happen due to loop entry and coninuation conditions. FILESYSTEM8_ASSERT #1 above
           // and #2 below added to verify that analysis.
         if ((sz = ::write(outfile, buf.get() + sz_write,
           sz_read - sz_write)) < 0)
@@ -465,7 +457,7 @@ namespace
           sz_read = sz; // cause read loop termination
           break;        //  and error reported after closes
         }
-        BOOST_ASSERT(sz > 0);                  // #2
+        FILESYSTEM8_ASSERT(sz > 0);                  // #2
         sz_write += sz;
       } while (sz_write < sz_read);
     }
@@ -633,7 +625,7 @@ namespace
       return fs::file_status(fs::type_unknown);
     }
     if (ec == 0)
-      BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::status",
+      FILESYSTEM8_THROW(filesystem_error("filesystem8::status",
         p, error_code(errval, system_category())));
     return fs::file_status(fs::status_error);
   }
@@ -700,7 +692,7 @@ namespace
 
 #endif
 
-//#ifdef BOOST_WINDOWS_API
+//#ifdef FILESYSTEM8_WINDOWS_API
 //
 //
 //  inline bool get_free_disk_space(const std::wstring& ph,
@@ -723,14 +715,14 @@ namespace boost
 namespace filesystem
 {
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path absolute(const path& p, const path& base)
   {
 //    if ( p.empty() || p.is_absolute() )
 //      return p;
 //    //  recursively calling absolute is sub-optimal, but is simple
 //    path abs_base(base.is_absolute() ? base : absolute(base));
-//# ifdef BOOST_WINDOWS_API
+//# ifdef FILESYSTEM8_WINDOWS_API
 //    if (p.has_root_directory())
 //      return abs_base.root_name() / p;
 //    //  !p.has_root_directory
@@ -762,7 +754,7 @@ namespace filesystem
 
     else if (!p_root_directory.empty())  // p.has_root_directory()
     {
-#     ifdef BOOST_POSIX_API
+#     ifdef FILESYSTEM8_POSIX_API
       // POSIX can have root name it it is a network path
       if (base_root_name.empty())   // !abs_base.has_root_name()
         return p;
@@ -780,9 +772,9 @@ namespace filesystem
 
 namespace detail
 {
-  BOOST_FILESYSTEM_DECL bool possible_large_file_size_support()
+  FILESYSTEM8_EXPORT bool possible_large_file_size_support()
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     struct stat lcl_stat;
     return sizeof(lcl_stat.st_size)> 4;
 #   else
@@ -790,7 +782,7 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path canonical(const path& p, const path& base, std::error_code* ec)
   {
     path source (p.is_absolute() ? p : absolute(p, base));
@@ -803,7 +795,7 @@ namespace detail
     if (stat.type() == fs::file_not_found)
     {
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error(
+        FILESYSTEM8_THROW(filesystem_error(
           "filesystem8::canonical", source,
           std::make_error_code(std::errc::no_such_file_or_directory)));
       *ec = std::make_error_code(std::errc::no_such_file_or_directory);
@@ -812,7 +804,7 @@ namespace detail
     else if (local_ec)
     {
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error(
+        FILESYSTEM8_THROW(filesystem_error(
           "filesystem8::canonical", source, local_ec));
       *ec = local_ec;
       return result;
@@ -868,11 +860,11 @@ namespace detail
     }
     if (ec != 0)
       ec->clear();
-    BOOST_ASSERT_MSG(result.is_absolute(), "canonical() implementation error; please report");
+    FILESYSTEM8_ASSERT_MSG(result.is_absolute(), "canonical() implementation error; please report");
     return result;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void copy(const path& from, const path& to, std::error_code* ec)
   {
     file_status s(symlink_status(from, *ec));
@@ -893,23 +885,23 @@ namespace detail
     else
     {
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::copy",
+        FILESYSTEM8_THROW(filesystem_error("filesystem8::copy",
           from, to, error_code(BOOST_ERROR_NOT_SUPPORTED, system_category())));
       ec->assign(BOOST_ERROR_NOT_SUPPORTED, system_category());
     }
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void copy_directory(const path& from, const path& to, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     struct stat from_stat;
 #   endif
     error(!BOOST_COPY_DIRECTORY(from.c_str(), to.c_str()) ? BOOST_ERRNO : 0,
       from, to, ec, "filesystem8::copy_directory");
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void copy_file(const path& from, const path& to, copy_option option, error_code* ec)
   {
     error(!BOOST_COPY_FILE(from.c_str(), to.c_str(),
@@ -917,7 +909,7 @@ namespace detail
         from, to, ec, "filesystem8::copy_file");
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void copy_symlink(const path& existing_symlink, const path& new_symlink,
     std::error_code* ec)
   {
@@ -925,7 +917,7 @@ namespace detail
     error(BOOST_ERROR_NOT_SUPPORTED, new_symlink, existing_symlink, ec,
       "filesystem8::copy_symlink");
 
-# else  // modern Windows or BOOST_POSIX_API 
+# else  // modern Windows or FILESYSTEM8_POSIX_API 
     path p(read_symlink(existing_symlink, ec));
     if (ec != 0 && *ec) return;
     create_symlink(p, new_symlink, ec);
@@ -933,7 +925,7 @@ namespace detail
 # endif
   }
 
- BOOST_FILESYSTEM_DECL
+ FILESYSTEM8_EXPORT
   bool create_directories(const path& p, std::error_code* ec)
   {
     path filename(p.filename());
@@ -953,7 +945,7 @@ namespace detail
     }
 
     path parent = p.parent_path();
-    BOOST_ASSERT_MSG(parent != p, "internal error: p == p.parent_path()");
+    FILESYSTEM8_ASSERT_MSG(parent != p, "internal error: p == p.parent_path()");
     if (!parent.empty())
     {
       // determine if the parent exists
@@ -966,7 +958,7 @@ namespace detail
         if (local_ec)
         {
           if (ec == 0)
-            BOOST_FILESYSTEM_THROW(filesystem_error(
+            FILESYSTEM8_THROW(filesystem_error(
               "filesystem8::create_directories", parent, local_ec));
           else
             *ec = local_ec;
@@ -979,7 +971,7 @@ namespace detail
     return create_directory(p, ec);
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   bool create_directory(const path& p, error_code* ec)
   {
     if (BOOST_CREATE_DIRECTORY(p.c_str()))
@@ -1001,24 +993,24 @@ namespace detail
 
     //  attempt to create directory failed && it doesn't already exist
     if (ec == 0)
-      BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::create_directory",
+      FILESYSTEM8_THROW(filesystem_error("filesystem8::create_directory",
         p, error_code(errval, system_category())));
     else
       ec->assign(errval, system_category());
     return false;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void create_directory_symlink(const path& to, const path& from,
                                  std::error_code* ec)
   {
-#   if defined(BOOST_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
+#   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
 
     error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_directory_symlink");
 #   else
 
-#     if defined(BOOST_WINDOWS_API) && _WIN32_WINNT >= 0x0600
+#     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0600
         // see if actually supported by Windows runtime dll
         if (error(!create_symbolic_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_directory_symlink"))
@@ -1031,17 +1023,17 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void create_hard_link(const path& to, const path& from, error_code* ec)
   {
 
-#   if defined(BOOST_WINDOWS_API) && _WIN32_WINNT < 0x0500  // SDK earlier than Win 2K
+#   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0500  // SDK earlier than Win 2K
 
     error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_hard_link");
 #   else
 
-#     if defined(BOOST_WINDOWS_API) && _WIN32_WINNT >= 0x0500
+#     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0500
         // see if actually supported by Windows runtime dll
         if (error(!create_hard_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_hard_link"))
@@ -1053,15 +1045,15 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void create_symlink(const path& to, const path& from, error_code* ec)
   {
-#   if defined(BOOST_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
+#   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
     error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_directory_symlink");
 #   else
 
-#     if defined(BOOST_WINDOWS_API) && _WIN32_WINNT >= 0x0600
+#     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0600
         // see if actually supported by Windows runtime dll
         if (error(!create_symbolic_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_symlink"))
@@ -1073,10 +1065,10 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path current_path(error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     path cur;
     for (long path_max = 128;; path_max *=2)// loop 'til buffer large enough
     {
@@ -1114,17 +1106,17 @@ namespace detail
   }
 
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void current_path(const path& p, std::error_code* ec)
   {
     error(!BOOST_SET_CURRENT_DIRECTORY(p.c_str()) ? BOOST_ERRNO : 0,
       p, ec, "filesystem8::current_path");
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   bool equivalent(const path& p1, const path& p2, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     struct stat s2;
     int e2(::stat(p2.c_str(), &s2));
     struct stat s1;
@@ -1214,10 +1206,10 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   std::uintmax_t file_size(const path& p, error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
@@ -1248,10 +1240,10 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   std::uintmax_t hard_link_count(const path& p, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     return error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
@@ -1277,7 +1269,7 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path initial_path(error_code* ec)
   {
       static path init_path;
@@ -1287,10 +1279,10 @@ namespace detail
       return init_path;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   bool is_empty(const path& p, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (error(::stat(p.c_str(), &path_stat)!= 0,
@@ -1314,10 +1306,10 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   std::time_t last_write_time(const path& p, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
@@ -1346,11 +1338,11 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void last_write_time(const path& p, const std::time_t new_time,
                         std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (error(::stat(p.c_str(), &path_stat)!= 0,
@@ -1381,21 +1373,21 @@ namespace detail
 #   endif
   }
 
-# ifdef BOOST_POSIX_API
+# ifdef FILESYSTEM8_POSIX_API
     const perms active_bits(perms::all | perms::set_uid | perms::set_gid | sticky_bit);
     inline mode_t mode_cast(perms prms) { return prms & active_bits; }
 # endif
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void permissions(const path& p, perms prms, std::error_code* ec)
   {
-    BOOST_ASSERT_MSG(!((prms & add_perms) && (prms & remove_perms)),
+    FILESYSTEM8_ASSERT_MSG(!((prms & add_perms) && (prms & remove_perms)),
       "add_perms and remove_perms are mutually exclusive");
 
     if ((prms & add_perms) && (prms & remove_perms))  // precondition failed
       return;
 
-# ifdef BOOST_POSIX_API
+# ifdef FILESYSTEM8_POSIX_API
     error_code local_ec;
     file_status current_status((prms & perms::resolve_symlinks)
                                ? fs::symlink_status(p, local_ec)
@@ -1403,7 +1395,7 @@ namespace detail
     if (local_ec)
     {
       if (ec == 0)
-      BOOST_FILESYSTEM_THROW(filesystem_error(
+      FILESYSTEM8_THROW(filesystem_error(
           "filesystem8::permissions", p, local_ec));
       else
         *ec = local_ec;
@@ -1440,7 +1432,7 @@ namespace detail
 #   endif
     {
       if (ec == 0)
-      BOOST_FILESYSTEM_THROW(filesystem_error(
+      FILESYSTEM8_THROW(filesystem_error(
           "filesystem8::permissions", p,
           error_code(errno, std::generic_category())));
       else
@@ -1473,12 +1465,12 @@ namespace detail
 # endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path read_symlink(const path& p, std::error_code* ec)
   {
     path symlink_path;
 
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     for (std::size_t path_max = 64;; path_max *= 2)// loop 'til buffer large enough
     {
@@ -1487,7 +1479,7 @@ namespace detail
       if ((result=::readlink(p.c_str(), buf.get(), path_max))== -1)
       {
         if (ec == 0)
-          BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::read_symlink",
+          FILESYSTEM8_THROW(filesystem_error("filesystem8::read_symlink",
             p, error_code(errno, system_category())));
         else ec->assign(errno, system_category());
         break;
@@ -1537,7 +1529,7 @@ namespace detail
     return symlink_path;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path relative(const path& p, const path& base, error_code* ec)
   {
     error_code tmp_ec;
@@ -1550,7 +1542,7 @@ namespace detail
     return wc_p.lexically_relative(wc_base);
   }
   
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   bool remove(const path& p, error_code* ec)
   {
     error_code tmp_ec;
@@ -1566,7 +1558,7 @@ namespace detail
     return remove_file_or_directory(p, type, ec);
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   std::uintmax_t remove_all(const path& p, error_code* ec)
   {
     error_code tmp_ec;
@@ -1580,24 +1572,24 @@ namespace detail
       : 0;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void rename(const path& old_p, const path& new_p, error_code* ec)
   {
     error(!BOOST_MOVE_FILE(old_p.c_str(), new_p.c_str()) ? BOOST_ERRNO : 0, old_p, new_p,
       ec, "filesystem8::rename");
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   void resize_file(const path& p, uintmax_t size, std::error_code* ec)
   {
     error(!BOOST_RESIZE_FILE(p.c_str(), size) ? BOOST_ERRNO : 0, p, ec,
       "filesystem8::resize_file");
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   space_info space(const path& p, error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     struct BOOST_STATVFS vfs;
     space_info info;
     if (!error(::BOOST_STATVFS(p.c_str(), &vfs)!= 0,
@@ -1638,10 +1630,10 @@ namespace detail
     return info;
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   file_status status(const path& p, error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (::stat(p.c_str(), &path_stat)!= 0)
@@ -1654,7 +1646,7 @@ namespace detail
         return fs::file_status(fs::file_not_found, fs::perms::none);
       }
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::status",
+        FILESYSTEM8_THROW(filesystem_error("filesystem8::status",
           p, error_code(errno, system_category())));
       return fs::file_status(fs::status_error);
     }
@@ -1718,10 +1710,10 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   file_status symlink_status(const path& p, error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
     if (::lstat(p.c_str(), &path_stat)!= 0)
@@ -1734,7 +1726,7 @@ namespace detail
         return fs::file_status(fs::file_not_found, fs::perms::none);
       }
       if (ec == 0)
-        BOOST_FILESYSTEM_THROW(filesystem_error("filesystem8::status",
+        FILESYSTEM8_THROW(filesystem_error("filesystem8::status",
           p, error_code(errno, system_category())));
       return fs::file_status(fs::status_error);
     }
@@ -1785,10 +1777,10 @@ namespace detail
   }
 
    // contributed by Jeff Flinn
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path temp_directory_path(std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
       const char* val = 0;
       
       (val = std::getenv("TMPDIR" )) ||
@@ -1855,10 +1847,10 @@ namespace detail
 #   endif
   }
   
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path system_complete(const path& p, std::error_code* ec)
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     return (p.empty() || p.is_absolute())
       ? p : current_path()/ p;
 
@@ -1887,7 +1879,7 @@ namespace detail
 #   endif
   }
 
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   path weakly_canonical(const path& p, std::error_code* ec)
   {
     path head(p);
@@ -1980,7 +1972,7 @@ namespace detail
 
 namespace
 {
-# ifdef BOOST_POSIX_API
+# ifdef FILESYSTEM8_POSIX_API
 
   error_code path_max(std::size_t & result)
   // this code is based on Stevens and Rago, Advanced Programming in the
@@ -2057,7 +2049,7 @@ namespace
   error_code dir_itr_increment(void *& handle, void *& buffer,
     string& target, fs::file_status & sf, fs::file_status & symlink_sf)
   {
-    BOOST_ASSERT(buffer != 0);
+    FILESYSTEM8_ASSERT(buffer != 0);
     dirent * entry(static_cast<dirent *>(buffer));
     dirent * result;
     int return_code;
@@ -2090,7 +2082,7 @@ namespace
     return ok;
   }
 
-# else // BOOST_WINDOWS_API
+# else // FILESYSTEM8_WINDOWS_API
 
   error_code dir_itr_first(void *& handle, const fs::path& dir,
     wstring& target, fs::file_status & sf, fs::file_status & symlink_sf)
@@ -2181,7 +2173,7 @@ namespace
 #endif
 
   const error_code not_found_error_code (
-#     ifdef BOOST_WINDOWS_API
+#     ifdef FILESYSTEM8_WINDOWS_API
         ERROR_PATH_NOT_FOUND
 #     else
         ENOENT 
@@ -2199,15 +2191,15 @@ namespace detail
 {
   //  dir_itr_close is called both from the ~dir_itr_imp()destructor 
   //  and dir_itr_increment()
-  BOOST_FILESYSTEM_DECL
+  FILESYSTEM8_EXPORT
   std::error_code dir_itr_close( // never throws
     void *& handle
-#   if defined(BOOST_POSIX_API)
+#   if defined(FILESYSTEM8_POSIX_API)
     , void *& buffer
 #   endif
    )
   {
-#   ifdef BOOST_POSIX_API
+#   ifdef FILESYSTEM8_POSIX_API
     std::free(buffer);
     buffer = 0;
     if (handle == 0)return ok;
@@ -2236,7 +2228,7 @@ namespace detail
     path::string_type filename;
     file_status file_stat, symlink_file_stat;
     error_code result = dir_itr_first(it.m_imp->handle,
-#     if defined(BOOST_POSIX_API)
+#     if defined(FILESYSTEM8_POSIX_API)
       it.m_imp->buffer,
 #     endif
       p.c_str(), filename, file_stat, symlink_file_stat);
@@ -2265,8 +2257,8 @@ namespace detail
   void directory_iterator_increment(directory_iterator& it,
     std::error_code* ec)
   {
-    BOOST_ASSERT_MSG(it.m_imp.get(), "attempt to increment end iterator");
-    BOOST_ASSERT_MSG(it.m_imp->handle != 0, "internal program error");
+    FILESYSTEM8_ASSERT_MSG(it.m_imp.get(), "attempt to increment end iterator");
+    FILESYSTEM8_ASSERT_MSG(it.m_imp->handle != 0, "internal program error");
     
     path::string_type filename;
     file_status file_stat, symlink_file_stat;
@@ -2275,7 +2267,7 @@ namespace detail
     for (;;)
     {
       temp_ec = dir_itr_increment(it.m_imp->handle,
-#       if defined(BOOST_POSIX_API)
+#       if defined(FILESYSTEM8_POSIX_API)
         it.m_imp->buffer,
 #       endif
         filename, file_stat, symlink_file_stat);
@@ -2285,7 +2277,7 @@ namespace detail
         path error_path(it.m_imp->dir_entry.path().parent_path());  // fix ticket #5900
         it.m_imp.reset();
         if (ec == 0)
-          BOOST_FILESYSTEM_THROW(
+          FILESYSTEM8_THROW(
             filesystem_error("filesystem8::directory_iterator::operator++",
               error_path,
               error_code(BOOST_ERRNO, system_category())));

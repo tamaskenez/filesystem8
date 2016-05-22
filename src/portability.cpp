@@ -53,12 +53,12 @@ namespace boost
     //  name_check functions  ----------------------------------------------//
 
 #   ifdef BOOST_WINDOWS
-    BOOST_FILESYSTEM_DECL bool native(const std::string & name)
+    FILESYSTEM8_EXPORT bool native(const std::string & name)
     {
       return windows_name(name);
     }
 #   else
-    BOOST_FILESYSTEM_DECL bool native(const std::string & name)
+    FILESYSTEM8_EXPORT bool native(const std::string & name)
     {
       return  name.size() != 0
         && name[0] != ' '
@@ -66,13 +66,13 @@ namespace boost
     }
 #   endif
 
-    BOOST_FILESYSTEM_DECL bool portable_posix_name(const std::string & name)
+    FILESYSTEM8_EXPORT bool portable_posix_name(const std::string & name)
     {
       return name.size() != 0
         && name.find_first_not_of(valid_posix) == std::string::npos;     
     }
 
-    BOOST_FILESYSTEM_DECL bool windows_name(const std::string & name)
+    FILESYSTEM8_EXPORT bool windows_name(const std::string & name)
     {
       return name.size() != 0
         && name[0] != ' '
@@ -82,7 +82,7 @@ namespace boost
           || name.length() == 1 || name == "..");
     }
 
-    BOOST_FILESYSTEM_DECL bool portable_name(const std::string & name)
+    FILESYSTEM8_EXPORT bool portable_name(const std::string & name)
     {
       return
         name.size() != 0
@@ -93,7 +93,7 @@ namespace boost
             && name[0] != '.' && name[0] != '-'));
     }
 
-    BOOST_FILESYSTEM_DECL bool portable_directory_name(const std::string & name)
+    FILESYSTEM8_EXPORT bool portable_directory_name(const std::string & name)
     {
       return
         name == "."
@@ -102,7 +102,7 @@ namespace boost
           && name.find('.') == std::string::npos);
     }
 
-    BOOST_FILESYSTEM_DECL bool portable_file_name(const std::string & name)
+    FILESYSTEM8_EXPORT bool portable_file_name(const std::string & name)
     {
       std::string::size_type pos;
       return
