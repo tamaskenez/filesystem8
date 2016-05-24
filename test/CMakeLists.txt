@@ -1,4 +1,5 @@
 unset(CMAKE_CXX_VISIBILITY_PRESET)
+unset(CMAKE_VISIBILITY_INLINES_HIDDEN)
 
 foreach(a
        convenience_test
