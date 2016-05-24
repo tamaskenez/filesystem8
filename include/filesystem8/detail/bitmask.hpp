@@ -6,18 +6,18 @@
 //  http://www.boost.org/LICENSE_1_0.txt
 
 //  Usage:  enum foo { a=1, b=2, c=4 };
-//          BOOST_BITMASK( foo );
+//          FILESYSTEM8_BITMASK( foo );
 //
 //          void f( foo arg );
 //          ...
 //          f( a | c );
 
-#ifndef BOOST_BITMASK_HPP
-#define BOOST_BITMASK_HPP
+#ifndef FILESYSTEM8_BITMASK_HPP
+#define FILESYSTEM8_BITMASK_HPP
 
 #include <cstdint>
 
-#define BOOST_BITMASK(Bitmask)                                            \
+#define FILESYSTEM8_BITMASK(Bitmask)                                            \
                                                                           \
   inline Bitmask operator| (Bitmask x , Bitmask y )                       \
   { return static_cast<Bitmask>( static_cast<std::int_least32_t>(x)     \
@@ -43,4 +43,4 @@
   inline Bitmask & operator^=(Bitmask & x , Bitmask y)                    \
   { x = x ^ y ; return x ; }                                              
 
-#endif // BOOST_BITMASK_HPP
+#endif // FILESYSTEM8_BITMASK_HPP

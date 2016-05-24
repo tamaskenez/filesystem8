@@ -9,24 +9,16 @@
 
 //--------------------------------------------------------------------------------------// 
 
-// define BOOST_FILESYSTEM_SOURCE so that <filesystem8/config.hpp> knows
+// define FILESYSTEM8_SOURCE so that <filesystem8/config.hpp> knows
 // the library is being built (possibly exporting rather than importing code)
-#define BOOST_FILESYSTEM_SOURCE 
-
-#ifndef BOOST_SYSTEM_NO_DEPRECATED 
-# define BOOST_SYSTEM_NO_DEPRECATED
-#endif
+#define FILESYSTEM8_SOURCE 
 
 #include <filesystem8/config.hpp>
 #include <filesystem8/path.hpp>
 
-namespace fs = boost::filesystem;
+namespace fs = filesystem8;
 
 #include <cstring> // SGI MIPSpro compilers need this
-
-# ifdef BOOST_NO_STDC_NAMESPACE
-    namespace std { using ::strerror; }
-# endif
 
 //--------------------------------------------------------------------------------------//
 
@@ -45,14 +37,12 @@ namespace
 
 } // unnamed namespace
 
-namespace boost
-{
-  namespace filesystem
+  namespace filesystem8
   {
 
     //  name_check functions  ----------------------------------------------//
 
-#   ifdef BOOST_WINDOWS
+#   ifdef _WIN32
     FILESYSTEM8_EXPORT bool native(const std::string & name)
     {
       return windows_name(name);
@@ -115,5 +105,4 @@ namespace boost
         ;
     }
 
-  } // namespace filesystem
-} // namespace boost
+  } // namespace filesystem8

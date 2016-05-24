@@ -44,11 +44,7 @@
 #endif
 #include <cerrno>
 
-#ifdef BOOST_FILEYSTEM_INCLUDE_IOSTREAM
-# include <iostream>
-#endif
-
-namespace fs = boost::filesystem;
+namespace fs = filesystem8;
 using filesystem8::path;
 using filesystem8::filesystem_error;
 using filesystem8::perms;
@@ -65,8 +61,8 @@ using std::wstring;
 #   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) \
  && !defined(__VXWORKS__)
 #     include <sys/statvfs.h>
-#     define BOOST_STATVFS statvfs
-#     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize
+#     define FILESYSTEM8_STATVFS statvfs
+#     define FILESYSTEM8_STATVFS_F_FRSIZE vfs.f_frsize
 #   else
 #     ifdef __OpenBSD__
 #       include <sys/param.h>
@@ -76,8 +72,8 @@ using std::wstring;
 #     if !defined(__VXWORKS__)
 #       include <sys/mount.h>
 #     endif
-#     define BOOST_STATVFS statfs
-#     define BOOST_STATVFS_F_FRSIZE static_cast<std::uintmax_t>(vfs.f_bsize)
+#     define FILESYSTEM8_STATVFS statfs
+#     define FILESYSTEM8_STATVFS_F_FRSIZE static_cast<std::uintmax_t>(vfs.f_bsize)
 #   endif
 #   include <dirent.h>
 #   include <unistd.h>
@@ -85,7 +81,7 @@ using std::wstring;
 #   include <utime.h>
 #   include "limits.h"
 
-# else // BOOST_WINDOW_API
+# else // FILESYSTEM8_WINDOW_API
 
 #   if (defined(__MINGW32__) || defined(__CYGWIN__)) && !defined(WINVER)
       // Versions of MinGW or Cygwin that support Filesystem V3 support at least WINVER 0x501.
@@ -176,14 +172,14 @@ inline std::wstring wgetenv(const wchar_t* name)
 
 # endif  // FILESYSTEM8_WINDOWS_API
 
-//  BOOST_FILESYSTEM_STATUS_CACHE enables file_status cache in
+//  FILESYSTEM8_STATUS_CACHE enables file_status cache in
 //  dir_itr_increment. The config tests are placed here because some of the
 //  macros being tested come from dirent.h.
 //
 // TODO: find out what macros indicate dirent::d_type present in more libraries
 # if defined(FILESYSTEM8_WINDOWS_API)\
   || defined(_DIRENT_HAVE_D_TYPE)// defined by GNU C library if d_type present
-#   define BOOST_FILESYSTEM_STATUS_CACHE
+#   define FILESYSTEM8_STATUS_CACHE
 # endif
 
 //  POSIX/Windows macros  ----------------------------------------------------//
@@ -200,42 +196,42 @@ inline std::wstring wgetenv(const wchar_t* name)
 typedef int err_t;
 
 //  POSIX uses a 0 return to indicate success
-#   define BOOST_ERRNO    errno 
-#   define BOOST_SET_CURRENT_DIRECTORY(P)(::chdir(P)== 0)
-#   define BOOST_CREATE_DIRECTORY(P)(::mkdir(P, S_IRWXU|S_IRWXG|S_IRWXO)== 0)
-#   define BOOST_CREATE_HARD_LINK(F,T)(::link(T, F)== 0)
-#   define BOOST_CREATE_SYMBOLIC_LINK(F,T,Flag)(::symlink(T, F)== 0)
-#   define BOOST_REMOVE_DIRECTORY(P)(::rmdir(P)== 0)
-#   define BOOST_DELETE_FILE(P)(::unlink(P)== 0)
-#   define BOOST_COPY_DIRECTORY(F,T)(!(::stat(from.c_str(), &from_stat)!= 0\
+#   define FILESYSTEM8_ERRNO    errno 
+#   define FILESYSTEM8_SET_CURRENT_DIRECTORY(P)(::chdir(P)== 0)
+#   define FILESYSTEM8_CREATE_DIRECTORY(P)(::mkdir(P, S_IRWXU|S_IRWXG|S_IRWXO)== 0)
+#   define FILESYSTEM8_CREATE_HARD_LINK(F,T)(::link(T, F)== 0)
+#   define FILESYSTEM8_CREATE_SYMBOLIC_LINK(F,T,Flag)(::symlink(T, F)== 0)
+#   define FILESYSTEM8_REMOVE_DIRECTORY(P)(::rmdir(P)== 0)
+#   define FILESYSTEM8_DELETE_FILE(P)(::unlink(P)== 0)
+#   define FILESYSTEM8_COPY_DIRECTORY(F,T)(!(::stat(from.c_str(), &from_stat)!= 0\
          || ::mkdir(to.c_str(),from_stat.st_mode)!= 0))
-#   define BOOST_COPY_FILE(F,T,FailIfExistsBool)copy_file_api(F, T, FailIfExistsBool)
-#   define BOOST_MOVE_FILE(OLD,NEW)(::rename(OLD, NEW)== 0)
-#   define BOOST_RESIZE_FILE(P,SZ)(::truncate(P, SZ)== 0)
+#   define FILESYSTEM8_COPY_FILE(F,T,FailIfExistsBool)copy_file_api(F, T, FailIfExistsBool)
+#   define FILESYSTEM8_MOVE_FILE(OLD,NEW)(::rename(OLD, NEW)== 0)
+#   define FILESYSTEM8_RESIZE_FILE(P,SZ)(::truncate(P, SZ)== 0)
 
-#   define BOOST_ERROR_NOT_SUPPORTED ENOSYS
-#   define BOOST_ERROR_ALREADY_EXISTS EEXIST
+#   define FILESYSTEM8_ERROR_NOT_SUPPORTED ENOSYS
+#   define FILESYSTEM8_ERROR_ALREADY_EXISTS EEXIST
 
 # else  // FILESYSTEM8_WINDOWS_API
 
 typedef DWORD err_t;
 
 //  Windows uses a non-0 return to indicate success
-#   define BOOST_ERRNO    ::GetLastError()
-#   define BOOST_SET_CURRENT_DIRECTORY(P)(::SetCurrentDirectoryW(P)!= 0)
-#   define BOOST_CREATE_DIRECTORY(P)(::CreateDirectoryW(P, 0)!= 0)
-#   define BOOST_CREATE_HARD_LINK(F,T)(create_hard_link_api(F, T, 0)!= 0)
-#   define BOOST_CREATE_SYMBOLIC_LINK(F,T,Flag)(create_symbolic_link_api(F, T, Flag)!= 0)
-#   define BOOST_REMOVE_DIRECTORY(P)(::RemoveDirectoryW(P)!= 0)
-#   define BOOST_DELETE_FILE(P)(::DeleteFileW(P)!= 0)
-#   define BOOST_COPY_DIRECTORY(F,T)(::CreateDirectoryExW(F, T, 0)!= 0)
-#   define BOOST_COPY_FILE(F,T,FailIfExistsBool)(::CopyFileW(F, T, FailIfExistsBool)!= 0)
-#   define BOOST_MOVE_FILE(OLD,NEW)(::MoveFileExW(OLD, NEW, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED)!= 0)
-#   define BOOST_RESIZE_FILE(P,SZ)(resize_file_api(P, SZ)!= 0)
-#   define BOOST_READ_SYMLINK(P,T)
+#   define FILESYSTEM8_ERRNO    ::GetLastError()
+#   define FILESYSTEM8_SET_CURRENT_DIRECTORY(P)(::SetCurrentDirectoryW(P)!= 0)
+#   define FILESYSTEM8_CREATE_DIRECTORY(P)(::CreateDirectoryW(P, 0)!= 0)
+#   define FILESYSTEM8_CREATE_HARD_LINK(F,T)(create_hard_link_api(F, T, 0)!= 0)
+#   define FILESYSTEM8_CREATE_SYMBOLIC_LINK(F,T,Flag)(create_symbolic_link_api(F, T, Flag)!= 0)
+#   define FILESYSTEM8_REMOVE_DIRECTORY(P)(::RemoveDirectoryW(P)!= 0)
+#   define FILESYSTEM8_DELETE_FILE(P)(::DeleteFileW(P)!= 0)
+#   define FILESYSTEM8_COPY_DIRECTORY(F,T)(::CreateDirectoryExW(F, T, 0)!= 0)
+#   define FILESYSTEM8_COPY_FILE(F,T,FailIfExistsBool)(::CopyFileW(F, T, FailIfExistsBool)!= 0)
+#   define FILESYSTEM8_MOVE_FILE(OLD,NEW)(::MoveFileExW(OLD, NEW, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED)!= 0)
+#   define FILESYSTEM8_RESIZE_FILE(P,SZ)(resize_file_api(P, SZ)!= 0)
+#   define FILESYSTEM8_READ_SYMLINK(P,T)
 
-#   define BOOST_ERROR_ALREADY_EXISTS ERROR_ALREADY_EXISTS
-#   define BOOST_ERROR_NOT_SUPPORTED ERROR_NOT_SUPPORTED
+#   define FILESYSTEM8_ERROR_ALREADY_EXISTS ERROR_ALREADY_EXISTS
+#   define FILESYSTEM8_ERROR_NOT_SUPPORTED ERROR_NOT_SUPPORTED
 
 # endif
 
@@ -329,15 +325,15 @@ namespace
   // only called if directory exists
   bool remove_directory(const path& p) // true if succeeds or not found
   { 
-    return BOOST_REMOVE_DIRECTORY(p.c_str())
-      || not_found_error(BOOST_ERRNO);  // mitigate possible file system race. See #11166
+    return FILESYSTEM8_REMOVE_DIRECTORY(p.c_str())
+      || not_found_error(FILESYSTEM8_ERRNO);  // mitigate possible file system race. See #11166
   }
   
   // only called if file exists
   bool remove_file(const path& p) // true if succeeds or not found
   {
-    return BOOST_DELETE_FILE(p.c_str())
-      || not_found_error(BOOST_ERRNO);  // mitigate possible file system race. See #11166
+    return FILESYSTEM8_DELETE_FILE(p.c_str())
+      || not_found_error(FILESYSTEM8_ERRNO);  // mitigate possible file system race. See #11166
   }
   
   // called by remove and remove_all_aux
@@ -356,13 +352,13 @@ namespace
 #     endif
       )
     {
-      if (error(!remove_directory(p) ? BOOST_ERRNO : 0, p, ec,
+      if (error(!remove_directory(p) ? FILESYSTEM8_ERRNO : 0, p, ec,
         "filesystem8::remove"))
           return false;
     }
     else
     {
-      if (error(!remove_file(p) ? BOOST_ERRNO : 0, p, ec,
+      if (error(!remove_file(p) ? FILESYSTEM8_ERRNO : 0, p, ec,
         "filesystem8::remove"))
           return false;
     }
@@ -503,9 +499,9 @@ namespace
 // offical 4.6.2 release with __GLIBCXX__ 20111026  doesn't. Play it safe for now, and
 // only use _stricmp if _MSC_VER is defined
 #if defined(_MSC_VER) // || (defined(__GLIBCXX__) && __GLIBCXX__ >= 20110325)
-#  define BOOST_FILESYSTEM_STRICMP _stricmp
+#  define FILESYSTEM8_STRICMP _stricmp
 #else
-#  define BOOST_FILESYSTEM_STRICMP strcmp
+#  define FILESYSTEM8_STRICMP strcmp
 #endif
 
   perms make_permissions(const path& p, DWORD attr)
@@ -513,10 +509,10 @@ namespace
     perms prms = fs::owner_read | fs::group_read | fs::others_read;
     if  ((attr & FILE_ATTRIBUTE_READONLY) == 0)
       prms |= fs::owner_write | fs::group_write | fs::others_write;
-    if (BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".exe") == 0
-      || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".com") == 0
-      || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".bat") == 0
-      || BOOST_FILESYSTEM_STRICMP(p.extension().string().c_str(), ".cmd") == 0)
+    if (FILESYSTEM8_STRICMP(p.extension().string().c_str(), ".exe") == 0
+      || FILESYSTEM8_STRICMP(p.extension().string().c_str(), ".com") == 0
+      || FILESYSTEM8_STRICMP(p.extension().string().c_str(), ".bat") == 0
+      || FILESYSTEM8_STRICMP(p.extension().string().c_str(), ".cmd") == 0)
       prms |= fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec;
     return prms;
   }
@@ -526,7 +522,7 @@ namespace
   {
     __int64 t = (static_cast<__int64>(ft.dwHighDateTime)<< 32)
       + ft.dwLowDateTime;
-#   if !defined(BOOST_MSVC) || BOOST_MSVC > 1300 // > VC++ 7.0
+#   if !defined(_MSC_VER) || _MSC_VER > 1300 // > VC++ 7.0
     t -= 116444736000000000LL;
 #   else
     t -= 116444736000000000;
@@ -539,7 +535,7 @@ namespace
   {
     __int64 temp = t;
     temp *= 10000000;
-#   if !defined(BOOST_MSVC) || BOOST_MSVC > 1300 // > VC++ 7.0
+#   if !defined(_MSC_VER) || _MSC_VER > 1300 // > VC++ 7.0
     temp += 116444736000000000LL;
 #   else
     temp += 116444736000000000;
@@ -582,7 +578,7 @@ namespace
     if (h.handle == INVALID_HANDLE_VALUE)
       return false;
 
-    boost::scoped_array<char> buf(new char [MAXIMUM_REPARSE_DATA_BUFFER_SIZE]);    
+    std::unique_ptr<char[]> buf(new char [MAXIMUM_REPARSE_DATA_BUFFER_SIZE]);    
  
     // Query the reparse data
     DWORD dwRetLen;
@@ -710,9 +706,7 @@ namespace
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem88
 {
 
   FILESYSTEM8_EXPORT
@@ -886,8 +880,8 @@ namespace detail
     {
       if (ec == 0)
         FILESYSTEM8_THROW(filesystem_error("filesystem8::copy",
-          from, to, error_code(BOOST_ERROR_NOT_SUPPORTED, system_category())));
-      ec->assign(BOOST_ERROR_NOT_SUPPORTED, system_category());
+          from, to, error_code(FILESYSTEM8_ERROR_NOT_SUPPORTED, system_category())));
+      ec->assign(FILESYSTEM8_ERROR_NOT_SUPPORTED, system_category());
     }
   }
 
@@ -897,15 +891,15 @@ namespace detail
 #   ifdef FILESYSTEM8_POSIX_API
     struct stat from_stat;
 #   endif
-    error(!BOOST_COPY_DIRECTORY(from.c_str(), to.c_str()) ? BOOST_ERRNO : 0,
+    error(!FILESYSTEM8_COPY_DIRECTORY(from.c_str(), to.c_str()) ? FILESYSTEM8_ERRNO : 0,
       from, to, ec, "filesystem8::copy_directory");
   }
 
   FILESYSTEM8_EXPORT
   void copy_file(const path& from, const path& to, copy_option option, error_code* ec)
   {
-    error(!BOOST_COPY_FILE(from.c_str(), to.c_str(),
-      option == fail_if_exists) ? BOOST_ERRNO : 0,
+    error(!FILESYSTEM8_COPY_FILE(from.c_str(), to.c_str(),
+      option == fail_if_exists) ? FILESYSTEM8_ERRNO : 0,
         from, to, ec, "filesystem8::copy_file");
   }
 
@@ -914,7 +908,7 @@ namespace detail
     std::error_code* ec)
   {
 # if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0600
-    error(BOOST_ERROR_NOT_SUPPORTED, new_symlink, existing_symlink, ec,
+    error(FILESYSTEM8_ERROR_NOT_SUPPORTED, new_symlink, existing_symlink, ec,
       "filesystem8::copy_symlink");
 
 # else  // modern Windows or FILESYSTEM8_POSIX_API 
@@ -974,7 +968,7 @@ namespace detail
   FILESYSTEM8_EXPORT
   bool create_directory(const path& p, error_code* ec)
   {
-    if (BOOST_CREATE_DIRECTORY(p.c_str()))
+    if (FILESYSTEM8_CREATE_DIRECTORY(p.c_str()))
     {
       if (ec != 0)
         ec->clear();
@@ -982,9 +976,9 @@ namespace detail
     }
 
     //  attempt to create directory failed
-    int errval(BOOST_ERRNO);  // save reason for failure
+    int errval(FILESYSTEM8_ERRNO);  // save reason for failure
     error_code dummy;
-    if (errval == BOOST_ERROR_ALREADY_EXISTS && is_directory(p, dummy))
+    if (errval == FILESYSTEM8_ERROR_ALREADY_EXISTS && is_directory(p, dummy))
     {
       if (ec != 0)
         ec->clear();
@@ -1006,19 +1000,19 @@ namespace detail
   {
 #   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
 
-    error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
+    error(FILESYSTEM8_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_directory_symlink");
 #   else
 
 #     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0600
         // see if actually supported by Windows runtime dll
-        if (error(!create_symbolic_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
+        if (error(!create_symbolic_link_api ? FILESYSTEM8_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_directory_symlink"))
           return;
 #     endif
 
-    error(!BOOST_CREATE_SYMBOLIC_LINK(from.c_str(), to.c_str(),
-      SYMBOLIC_LINK_FLAG_DIRECTORY) ? BOOST_ERRNO : 0,
+    error(!FILESYSTEM8_CREATE_SYMBOLIC_LINK(from.c_str(), to.c_str(),
+      SYMBOLIC_LINK_FLAG_DIRECTORY) ? FILESYSTEM8_ERRNO : 0,
       to, from, ec, "filesystem8::create_directory_symlink");
 #   endif
   }
@@ -1029,18 +1023,18 @@ namespace detail
 
 #   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0500  // SDK earlier than Win 2K
 
-    error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
+    error(FILESYSTEM8_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_hard_link");
 #   else
 
 #     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0500
         // see if actually supported by Windows runtime dll
-        if (error(!create_hard_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
+        if (error(!create_hard_link_api ? FILESYSTEM8_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_hard_link"))
           return;
 #     endif
 
-    error(!BOOST_CREATE_HARD_LINK(from.c_str(), to.c_str()) ? BOOST_ERRNO : 0, to, from, ec,
+    error(!FILESYSTEM8_CREATE_HARD_LINK(from.c_str(), to.c_str()) ? FILESYSTEM8_ERRNO : 0, to, from, ec,
       "filesystem8::create_hard_link");
 #   endif
   }
@@ -1049,18 +1043,18 @@ namespace detail
   void create_symlink(const path& to, const path& from, error_code* ec)
   {
 #   if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
-    error(BOOST_ERROR_NOT_SUPPORTED, to, from, ec,
+    error(FILESYSTEM8_ERROR_NOT_SUPPORTED, to, from, ec,
       "filesystem8::create_directory_symlink");
 #   else
 
 #     if defined(FILESYSTEM8_WINDOWS_API) && _WIN32_WINNT >= 0x0600
         // see if actually supported by Windows runtime dll
-        if (error(!create_symbolic_link_api ? BOOST_ERROR_NOT_SUPPORTED : 0, to, from, ec,
+        if (error(!create_symbolic_link_api ? FILESYSTEM8_ERROR_NOT_SUPPORTED : 0, to, from, ec,
             "filesystem8::create_symlink"))
           return;
 #     endif
 
-    error(!BOOST_CREATE_SYMBOLIC_LINK(from.c_str(), to.c_str(), 0) ? BOOST_ERRNO : 0,
+    error(!FILESYSTEM8_CREATE_SYMBOLIC_LINK(from.c_str(), to.c_str(), 0) ? FILESYSTEM8_ERRNO : 0,
       to, from, ec, "filesystem8::create_symlink");
 #   endif
   }
@@ -1098,8 +1092,8 @@ namespace detail
 #   else
     DWORD sz;
     if ((sz = ::GetCurrentDirectoryW(0, NULL)) == 0)sz = 1;
-    boost::scoped_array<path::value_type> buf(new path::value_type[sz]);
-    error(::GetCurrentDirectoryW(sz, buf.get()) == 0 ? BOOST_ERRNO : 0, ec,
+    std::unique_ptr<path::value_type[]> buf(new path::value_type[sz]);
+    error(::GetCurrentDirectoryW(sz, buf.get()) == 0 ? FILESYSTEM8_ERRNO : 0, ec,
       "filesystem8::current_path");
     return path(buf.get());
 #   endif
@@ -1109,7 +1103,7 @@ namespace detail
   FILESYSTEM8_EXPORT
   void current_path(const path& p, std::error_code* ec)
   {
-    error(!BOOST_SET_CURRENT_DIRECTORY(p.c_str()) ? BOOST_ERRNO : 0,
+    error(!FILESYSTEM8_SET_CURRENT_DIRECTORY(p.c_str()) ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::current_path");
   }
 
@@ -1172,7 +1166,7 @@ namespace detail
       // if one is invalid and the other isn't, then they aren't equivalent,
       // but if both are invalid then it is an error
       error((h1.handle == INVALID_HANDLE_VALUE
-        && h2.handle == INVALID_HANDLE_VALUE) ? BOOST_ERROR_NOT_SUPPORTED : 0, p1, p2, ec,
+        && h2.handle == INVALID_HANDLE_VALUE) ? FILESYSTEM8_ERROR_NOT_SUPPORTED : 0, p1, p2, ec,
           "filesystem8::equivalent");
       return false;
     }
@@ -1181,11 +1175,11 @@ namespace detail
 
     BY_HANDLE_FILE_INFORMATION info1, info2;
 
-    if (error(!::GetFileInformationByHandle(h1.handle, &info1) ? BOOST_ERRNO : 0,
+    if (error(!::GetFileInformationByHandle(h1.handle, &info1) ? FILESYSTEM8_ERRNO : 0,
       p1, p2, ec, "filesystem8::equivalent"))
         return  false;
 
-    if (error(!::GetFileInformationByHandle(h2.handle, &info2) ? BOOST_ERRNO : 0,
+    if (error(!::GetFileInformationByHandle(h2.handle, &info2) ? FILESYSTEM8_ERRNO : 0,
       p1, p2, ec, "filesystem8::equivalent"))
         return  false;
 
@@ -1212,7 +1206,7 @@ namespace detail
 #   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
-    if (error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
+    if (error(::stat(p.c_str(), &path_stat)!= 0 ? FILESYSTEM8_ERRNO : 0,
         p, ec, "filesystem8::file_size"))
       return static_cast<std::uintmax_t>(-1);
    if (error(!S_ISREG(path_stat.st_mode) ? EPERM : 0,
@@ -1228,7 +1222,7 @@ namespace detail
     WIN32_FILE_ATTRIBUTE_DATA fad;
 
     if (error(::GetFileAttributesExW(p.c_str(), ::GetFileExInfoStandard, &fad)== 0
-      ? BOOST_ERRNO : 0, p, ec, "filesystem8::file_size"))
+      ? FILESYSTEM8_ERRNO : 0, p, ec, "filesystem8::file_size"))
           return static_cast<std::uintmax_t>(-1);
 
     if (error((fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)!= 0
@@ -1246,7 +1240,7 @@ namespace detail
 #   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
-    return error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
+    return error(::stat(p.c_str(), &path_stat)!= 0 ? FILESYSTEM8_ERRNO : 0,
                   p, ec, "filesystem8::hard_link_count")
            ? 0
            : static_cast<std::uintmax_t>(path_stat.st_nlink);
@@ -1260,9 +1254,9 @@ namespace detail
           FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0,
           OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
     return
-      !error(h.handle == INVALID_HANDLE_VALUE ? BOOST_ERRNO : 0,
+      !error(h.handle == INVALID_HANDLE_VALUE ? FILESYSTEM8_ERRNO : 0,
               p, ec, "filesystem8::hard_link_count")
-      && !error(::GetFileInformationByHandle(h.handle, &info)== 0 ? BOOST_ERRNO : 0,
+      && !error(::GetFileInformationByHandle(h.handle, &info)== 0 ? FILESYSTEM8_ERRNO : 0,
                  p, ec, "filesystem8::hard_link_count")
            ? info.nNumberOfLinks
            : 0;
@@ -1295,7 +1289,7 @@ namespace detail
 
     WIN32_FILE_ATTRIBUTE_DATA fad;
     if (error(::GetFileAttributesExW(p.c_str(), ::GetFileExInfoStandard, &fad)== 0
-      ? BOOST_ERRNO : 0, p, ec, "filesystem8::is_empty"))
+      ? FILESYSTEM8_ERRNO : 0, p, ec, "filesystem8::is_empty"))
         return false;
 
     if (ec != 0) ec->clear();
@@ -1312,7 +1306,7 @@ namespace detail
 #   ifdef FILESYSTEM8_POSIX_API
 
     struct stat path_stat;
-    if (error(::stat(p.c_str(), &path_stat)!= 0 ? BOOST_ERRNO : 0,
+    if (error(::stat(p.c_str(), &path_stat)!= 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time"))
         return std::time_t(-1);
     return path_stat.st_mtime;
@@ -1324,13 +1318,13 @@ namespace detail
         FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0,
         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
 
-    if (error(hw.handle == INVALID_HANDLE_VALUE ? BOOST_ERRNO : 0,
+    if (error(hw.handle == INVALID_HANDLE_VALUE ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time"))
         return std::time_t(-1);
 
     FILETIME lwt;
 
-    if (error(::GetFileTime(hw.handle, 0, 0, &lwt)== 0 ? BOOST_ERRNO : 0,
+    if (error(::GetFileTime(hw.handle, 0, 0, &lwt)== 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time"))
         return std::time_t(-1);
 
@@ -1351,7 +1345,7 @@ namespace detail
     ::utimbuf buf;
     buf.actime = path_stat.st_atime; // utime()updates access time too:-(
     buf.modtime = new_time;
-    error(::utime(p.c_str(), &buf)!= 0 ? BOOST_ERRNO : 0,
+    error(::utime(p.c_str(), &buf)!= 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time");
 
 #   else
@@ -1361,14 +1355,14 @@ namespace detail
         FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0,
         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
 
-    if (error(hw.handle == INVALID_HANDLE_VALUE ? BOOST_ERRNO : 0,
+    if (error(hw.handle == INVALID_HANDLE_VALUE ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time"))
         return;
 
     FILETIME lwt;
     to_FILETIME(new_time, lwt);
 
-    error(::SetFileTime(hw.handle, 0, 0, &lwt)== 0 ? BOOST_ERRNO : 0,
+    error(::SetFileTime(hw.handle, 0, 0, &lwt)== 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::last_write_time");
 #   endif
   }
@@ -1448,7 +1442,7 @@ namespace detail
 
     DWORD attr = ::GetFileAttributesW(p.c_str());
 
-    if (error(attr == 0 ? BOOST_ERRNO : 0, p, ec, "filesystem8::permissions"))
+    if (error(attr == 0 ? FILESYSTEM8_ERRNO : 0, p, ec, "filesystem8::permissions"))
       return;
 
     if (prms & add_perms)
@@ -1460,7 +1454,7 @@ namespace detail
     else
       attr |= FILE_ATTRIBUTE_READONLY;
 
-    error(::SetFileAttributesW(p.c_str(), attr) == 0 ? BOOST_ERRNO : 0,
+    error(::SetFileAttributesW(p.c_str(), attr) == 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::permissions");
 # endif
   }
@@ -1496,7 +1490,7 @@ namespace detail
     }
 
 #   elif _WIN32_WINNT < 0x0600  // SDK earlier than Vista and Server 2008
-    error(BOOST_ERROR_NOT_SUPPORTED, p, ec,
+    error(FILESYSTEM8_ERROR_NOT_SUPPORTED, p, ec,
           "filesystem8::read_symlink");
 #   else  // Vista and Server 2008 SDK, or later
 
@@ -1510,14 +1504,14 @@ namespace detail
       create_file_handle(p.c_str(), GENERIC_READ, 0, 0, OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, 0));
 
-    if (error(h.handle == INVALID_HANDLE_VALUE ? BOOST_ERRNO : 0,
+    if (error(h.handle == INVALID_HANDLE_VALUE ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::read_symlink"))
         return symlink_path;
 
     DWORD sz;
 
     if (!error(::DeviceIoControl(h.handle, FSCTL_GET_REPARSE_POINT,
-          0, 0, info.buf, sizeof(info), &sz, 0) == 0 ? BOOST_ERRNO : 0, p, ec,
+          0, 0, info.buf, sizeof(info), &sz, 0) == 0 ? FILESYSTEM8_ERRNO : 0, p, ec,
           "filesystem8::read_symlink" ))
       symlink_path.assign(
         static_cast<wchar_t*>(info.rdb.SymbolicLinkReparseBuffer.PathBuffer)
@@ -1575,14 +1569,14 @@ namespace detail
   FILESYSTEM8_EXPORT
   void rename(const path& old_p, const path& new_p, error_code* ec)
   {
-    error(!BOOST_MOVE_FILE(old_p.c_str(), new_p.c_str()) ? BOOST_ERRNO : 0, old_p, new_p,
+    error(!FILESYSTEM8_MOVE_FILE(old_p.c_str(), new_p.c_str()) ? FILESYSTEM8_ERRNO : 0, old_p, new_p,
       ec, "filesystem8::rename");
   }
 
   FILESYSTEM8_EXPORT
   void resize_file(const path& p, uintmax_t size, std::error_code* ec)
   {
-    error(!BOOST_RESIZE_FILE(p.c_str(), size) ? BOOST_ERRNO : 0, p, ec,
+    error(!FILESYSTEM8_RESIZE_FILE(p.c_str(), size) ? FILESYSTEM8_ERRNO : 0, p, ec,
       "filesystem8::resize_file");
   }
 
@@ -1590,17 +1584,17 @@ namespace detail
   space_info space(const path& p, error_code* ec)
   {
 #   ifdef FILESYSTEM8_POSIX_API
-    struct BOOST_STATVFS vfs;
+    struct FILESYSTEM8_STATVFS vfs;
     space_info info;
-    if (!error(::BOOST_STATVFS(p.c_str(), &vfs)!= 0,
+    if (!error(::FILESYSTEM8_STATVFS(p.c_str(), &vfs)!= 0,
       p, ec, "filesystem8::space"))
     {
       info.capacity 
-        = static_cast<std::uintmax_t>(vfs.f_blocks)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_blocks)* FILESYSTEM8_STATVFS_F_FRSIZE;
       info.free 
-        = static_cast<std::uintmax_t>(vfs.f_bfree)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_bfree)* FILESYSTEM8_STATVFS_F_FRSIZE;
       info.available
-        = static_cast<std::uintmax_t>(vfs.f_bavail)* BOOST_STATVFS_F_FRSIZE;
+        = static_cast<std::uintmax_t>(vfs.f_bavail)* FILESYSTEM8_STATVFS_F_FRSIZE;
     }
 
 #   else
@@ -1864,15 +1858,15 @@ namespace detail
     wchar_t* pfn;
     std::size_t len = get_full_path_name(p, buf_size, buf, &pfn);
 
-    if (error(len == 0 ? BOOST_ERRNO : 0, p, ec, "filesystem8::system_complete"))
+    if (error(len == 0 ? FILESYSTEM8_ERRNO : 0, p, ec, "filesystem8::system_complete"))
       return path();
 
     if (len < buf_size)// len does not include null termination character
       return path(&buf[0]);
 
-    boost::scoped_array<wchar_t> big_buf(new wchar_t[len]);
+    std::unique_ptr<wchar_t[]> big_buf(new wchar_t[len]);
 
-    return error(get_full_path_name(p, len , big_buf.get(), &pfn)== 0 ? BOOST_ERRNO : 0,
+    return error(get_full_path_name(p, len , big_buf.get(), &pfn)== 0 ? FILESYSTEM8_ERRNO : 0,
       p, ec, "filesystem8::system_complete")
       ? path()
       : path(big_buf.get());
@@ -1961,8 +1955,7 @@ namespace detail
 //  <filesystem8/path_traits.hpp>, thus avoiding header circularity.
 //  test cases are in operations_unit_test.cpp
 
-} // namespace filesystem
-} // namespace boost
+} // namespace filesystem88
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -2058,7 +2051,7 @@ namespace
     if (result == 0)
       return fs::detail::dir_itr_close(handle, buffer);
     target = entry->d_name;
-#   ifdef BOOST_FILESYSTEM_STATUS_CACHE
+#   ifdef FILESYSTEM8_STATUS_CACHE
     if (entry->d_type == DT_UNKNOWN) // filesystem does not supply d_type value
     {
       sf = symlink_sf = fs::file_status(fs::status_error);
@@ -2182,9 +2175,7 @@ namespace
 
 }  // unnamed namespace
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem88
 {
 
 namespace detail
@@ -2280,8 +2271,8 @@ namespace detail
           FILESYSTEM8_THROW(
             filesystem_error("filesystem8::directory_iterator::operator++",
               error_path,
-              error_code(BOOST_ERRNO, system_category())));
-        ec->assign(BOOST_ERRNO, system_category());
+              error_code(FILESYSTEM8_ERRNO, system_category())));
+        ec->assign(FILESYSTEM8_ERRNO, system_category());
         return;
       }
       else if (ec != 0) ec->clear();
@@ -2304,5 +2295,4 @@ namespace detail
     }
   }
 }  // namespace detail
-} // namespace filesystem
-} // namespace boost
+} // namespace filesystem88

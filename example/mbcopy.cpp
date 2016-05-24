@@ -10,10 +10,10 @@
 //  See http://../doc/path.htm#mbpath for more information
 
 //  See deprecated_test for tests of deprecated features
-#define BOOST_FILESYSTEM_NO_DEPRECATED
+#define FILESYSTEM8_NO_DEPRECATED
 
 #include <filesystem8/config.hpp>
-# ifdef BOOST_FILESYSTEM_NARROW_ONLY
+# ifdef FILESYSTEM8_NARROW_ONLY
 #   error This compiler or standard library does not support wide-character strings or paths
 # endif
 

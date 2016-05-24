@@ -38,6 +38,8 @@
 
 #define FILESYSTEM8_THROW(EX) throw EX
 
+// #define BOOST_NO_CXX11_RVALUE_REFERENCES
+
 namespace filesystem8 {}
 
 #endif // FILESYSTEM8_CONFIG_HPP

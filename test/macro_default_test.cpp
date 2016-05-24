@@ -9,8 +9,8 @@
 
 #undef BOOST_ALL_DYN_LINK
 #undef BOOST_ALL_STATIC_LINK
-#undef BOOST_FILESYSTEM_DYN_LINK
-#undef BOOST_FILESYSTEM_STATIC_LINK
+#undef FILESYSTEM8_DYN_LINK
+#undef FILESYSTEM8_STATIC_LINK
 #undef BOOST_SYSTEM_DYN_LINK
 #undef BOOST_SYSTEM_STATIC_LINK
 
@@ -21,8 +21,8 @@
 #include <filesystem8/config.hpp>
 #include <boost/system/config.hpp>
 
-#ifndef BOOST_FILESYSTEM_STATIC_LINK
-# error BOOST_FILESYSTEM_STATIC_LINK not set by default
+#ifndef FILESYSTEM8_STATIC_LINK
+# error FILESYSTEM8_STATIC_LINK not set by default
 #endif
 
 

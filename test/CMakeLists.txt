@@ -21,6 +21,6 @@ foreach(a
     get_filename_component(F ${a} NAME)
     set(t test_${F})
     add_executable(${t} ${a})
-    target_link_libraries(${t} PRIVATE filesystem) 
+    target_link_libraries(${t} PRIVATE filesystem8) 
     add_test(NAME ${t} COMMAND ${t})
 endforeach()

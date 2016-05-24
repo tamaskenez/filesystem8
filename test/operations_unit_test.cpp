@@ -17,8 +17,8 @@
 #include <boost/config/warning_disable.hpp>
 
 //  See deprecated_test for tests of deprecated features
-#ifndef BOOST_FILESYSTEM_NO_DEPRECATED 
-#  define BOOST_FILESYSTEM_NO_DEPRECATED
+#ifndef FILESYSTEM8_NO_DEPRECATED 
+#  define FILESYSTEM8_NO_DEPRECATED
 #endif
 #ifndef BOOST_SYSTEM_NO_DEPRECATED 
 #  define BOOST_SYSTEM_NO_DEPRECATED

@@ -15,16 +15,10 @@
 #ifndef FILESYSTEM8_OPERATIONS_HPP
 #define FILESYSTEM8_OPERATIONS_HPP
 
-#include <boost/config.hpp>
-
-# if defined( BOOST_NO_STD_WSTRING )
-#   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
-# endif
-
 #include <filesystem8/config.hpp>
 #include <filesystem8/path.hpp>
 
-#include <boost/detail/bitmask.hpp>
+#include <filesystem8/detail/bitmask.hpp>
 #include <system_error>
 #include <memory>
 #include <type_traits>
@@ -42,9 +36,7 @@
 
 //--------------------------------------------------------------------------------------//
 
-namespace boost
-{
-  namespace filesystem
+  namespace filesystem8
   {
 
     //--------------------------------------------------------------------------------------//
@@ -233,7 +225,7 @@ namespace boost
     resolve_symlinks = 0x4000  // on POSIX, don't resolve symlinks; implied on Windows
   };
 
-BOOST_BITMASK(perms)
+FILESYSTEM8_BITMASK(perms)
 
 //--------------------------------------------------------------------------------------//
 //                                    file_status                                       //
@@ -262,7 +254,7 @@ BOOST_BITMASK(perms)
       return *this;
     }
 
-# if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+# if !defined(FILESYSTEM8_NO_CXX11_RVALUE_REFERENCES)
     file_status(file_status&& rhs) FILESYSTEM8_NOEXCEPT
     {
       m_value = std::move(rhs.m_value);
@@ -507,7 +499,7 @@ BOOST_BITMASK(perms)
                                        {detail::copy_directory(from, to, &ec);}
   inline
   void copy_file(const path& from, const path& to,   // See ticket #2925
-                 BOOST_SCOPED_ENUM(copy_option) option)
+                 copy_option option)
   {
     detail::copy_file(from, to, static_cast<detail::copy_option>(option));
   }
@@ -518,7 +510,7 @@ BOOST_BITMASK(perms)
   }
   inline
   void copy_file(const path& from, const path& to,   // See ticket #2925
-                 BOOST_SCOPED_ENUM(copy_option) option, std::error_code& ec) FILESYSTEM8_NOEXCEPT
+                 copy_option option, std::error_code& ec) FILESYSTEM8_NOEXCEPT
   {
     detail::copy_file(from, to, static_cast<detail::copy_option>(option), &ec);
   }
@@ -739,7 +731,7 @@ public:
   //  for VC++, GCC, and probably other compilers, that =default is not used with noexcept
   //  functions. GCC is not even consistent for the same release on different platforms.
 
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+#if !defined(FILESYSTEM8_NO_CXX11_RVALUE_REFERENCES)
   directory_entry(directory_entry&& rhs) FILESYSTEM8_NOEXCEPT
   {
     m_path = std::move(rhs.m_path);
@@ -929,10 +921,10 @@ namespace detail
   directory_iterator range_end(const directory_iterator&) FILESYSTEM8_NOEXCEPT
     {return directory_iterator();}
 
-  }  // namespace filesystem
+  }  // namespace filesystem8
 
 
-namespace filesystem
+namespace filesystem8
 {
 
 //--------------------------------------------------------------------------------------//
@@ -949,7 +941,7 @@ namespace filesystem
     _detail_no_push = recurse << 1  // internal use only
   };
   
-  BOOST_BITMASK(BOOST_SCOPED_ENUM(symlink_option))
+  FILESYSTEM8_BITMASK(symlink_option)
 
   namespace detail
   {
@@ -958,7 +950,7 @@ namespace filesystem
       typedef directory_iterator element_type;
       std::stack< element_type, std::vector< element_type > > m_stack;
       int  m_level;
-      BOOST_SCOPED_ENUM(symlink_option) m_options;
+      symlink_option m_options;
 
       recur_dir_itr_imp() : m_level(0), m_options(symlink_option::none) {}
 
@@ -1110,7 +1102,7 @@ namespace filesystem
     }
 
     recursive_directory_iterator(const path& dir_path,
-      BOOST_SCOPED_ENUM(symlink_option) opt)  // throws if !exists()
+      symlink_option opt)  // throws if !exists()
       : m_imp(new detail::recur_dir_itr_imp)
     {
       m_imp->m_options = opt;
@@ -1120,7 +1112,7 @@ namespace filesystem
     }
 
     recursive_directory_iterator(const path& dir_path,
-      BOOST_SCOPED_ENUM(symlink_option) opt,
+      symlink_option opt,
       std::error_code & ec) FILESYSTEM8_NOEXCEPT
     : m_imp(new detail::recur_dir_itr_imp)
     {
@@ -1262,9 +1254,9 @@ namespace filesystem
   inline
   recursive_directory_iterator range_end(const recursive_directory_iterator&) FILESYSTEM8_NOEXCEPT
                                                   {return recursive_directory_iterator();}
-  }  // namespace filesystem
+  }  // namespace filesystem8
 
-namespace filesystem
+namespace filesystem8
 {
 
 //  test helper  -----------------------------------------------------------------------//
@@ -1277,8 +1269,6 @@ namespace filesystem
   {
     FILESYSTEM8_EXPORT bool possible_large_file_size_support();
   }
-  } // namespace filesystem
-
-} // namespace boost
+  } // namespace filesystem8
 
 #endif // FILESYSTEM8_OPERATIONS_HPP

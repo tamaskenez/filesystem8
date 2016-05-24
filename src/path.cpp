@@ -9,18 +9,6 @@
 
 //  Old standard library configurations, particularly MingGW, don't support wide strings.
 //  Report this with an explicit error message.
-#include <boost/config.hpp>
-# if defined( BOOST_NO_STD_WSTRING )
-#   error Configuration not supported: Boost.Filesystem V3 and later requires std::wstring support
-# endif
-
-// define BOOST_FILESYSTEM_SOURCE so that <boost/system/config.hpp> knows
-// the library is being built (possibly exporting rather than importing code)
-#define BOOST_FILESYSTEM_SOURCE 
-
-#ifndef BOOST_SYSTEM_NO_DEPRECATED 
-# define BOOST_SYSTEM_NO_DEPRECATED
-#endif
 
 #include <filesystem8/config.hpp>
 #include <filesystem8/path.hpp>
@@ -36,12 +24,12 @@
 # include <windows.h>
 #endif
 
-#ifdef BOOST_FILESYSTEM_DEBUG
+#ifdef FILESYSTEM8_DEBUG
 # include <iostream>
 # include <iomanip>
 #endif
 
-namespace fs = boost::filesystem;
+namespace fs = filesystem8;
 
 using filesystem8::path;
 
@@ -125,9 +113,7 @@ namespace
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem8
 {
   path& path::operator/=(const path& p)
   {
@@ -486,8 +472,7 @@ namespace filesystem
       temp /= detail::dot_path();
     return temp;
   }
-}  // namespace filesystem
-}  // namespace boost
+}  // namespace filesystem8
   
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -672,9 +657,7 @@ namespace
 }  // unnamed namespace
 
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem8
 {
   namespace detail
   {
@@ -838,5 +821,4 @@ namespace filesystem
     if (it.m_element.m_pathname == preferred_separator_string) // needed for Windows, harmless on POSIX 
       it.m_element.m_pathname = separator_string;    // generic format; see docs 
   }
-}  // namespace filesystem
-}  // namespace boost
+}  // namespace filesystem8

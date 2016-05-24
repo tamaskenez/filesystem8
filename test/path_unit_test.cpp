@@ -22,8 +22,8 @@
 #include <boost/config/warning_disable.hpp>
 
 //  See deprecated_test for tests of deprecated features
-#ifndef BOOST_FILESYSTEM_NO_DEPRECATED 
-# define BOOST_FILESYSTEM_NO_DEPRECATED
+#ifndef FILESYSTEM8_NO_DEPRECATED 
+# define FILESYSTEM8_NO_DEPRECATED
 #endif
 #ifndef BOOST_SYSTEM_NO_DEPRECATED 
 # define BOOST_SYSTEM_NO_DEPRECATED
@@ -285,7 +285,7 @@ namespace
   {
     std::cout << "testing move_construction_and_assignment..." << std::endl;
 
-# if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+# if !defined(FILESYSTEM8_NO_CXX11_RVALUE_REFERENCES)
     path from("long enough to avoid small object optimization");
     path to(std::move(from));
     BOOST_TEST(to == "long enough to avoid small object optimization");
@@ -1035,7 +1035,7 @@ namespace
 
 namespace boost
 {
-namespace filesystem
+namespace filesystem8
 {
   namespace path_traits
   {
@@ -1076,7 +1076,7 @@ namespace filesystem
       return temp;
     }
   }  // namespace path_traits
-}  // namespace filesystem
+}  // namespace filesystem8
 }  // namespace boost
 
 namespace

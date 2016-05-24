@@ -11,7 +11,7 @@
 
 namespace boost
 {
-  namespace filesystem
+  namespace filesystem8
   {
     void tu2();
   }

@@ -10,8 +10,8 @@
 #include <boost/config/warning_disable.hpp>
 
 //  See deprecated_test for tests of deprecated features
-#ifndef BOOST_FILESYSTEM_NO_DEPRECATED 
-#  define BOOST_FILESYSTEM_NO_DEPRECATED
+#ifndef FILESYSTEM8_NO_DEPRECATED 
+#  define FILESYSTEM8_NO_DEPRECATED
 #endif
 #ifndef BOOST_SYSTEM_NO_DEPRECATED 
 #  define BOOST_SYSTEM_NO_DEPRECATED
@@ -142,8 +142,8 @@ int cpp_main(int argc, char*[])
 {
   if (argc > 1) cleanup = false;
 
-  std::cout << "BOOST_FILESYSTEM_C_STR defined as \""
-            << BOOST_STRINGIZE(BOOST_FILESYSTEM_C_STR) << "\"\n";
+  std::cout << "FILESYSTEM8_C_STR defined as \""
+            << BOOST_STRINGIZE(FILESYSTEM8_C_STR) << "\"\n";
 
   // test narrow characters
   std::cout << "narrow character tests:\n";

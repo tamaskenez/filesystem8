@@ -13,9 +13,7 @@
 #include <string>
 #include <filesystem8/operations.hpp>
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem8
 {
 inline
 void save_string_file(const path& p, const std::string& str)
@@ -36,7 +34,6 @@ void load_string_file(const path& p, std::string& str)
   str.resize(sz, '\0');
   file.read(&str[0], sz);
 }
-}  // namespace filesystem
-}  // namespace boost
+}  // namespace filesystem8
 
 #endif  // include guard

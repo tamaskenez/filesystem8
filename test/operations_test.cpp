@@ -10,8 +10,8 @@
 #include <boost/config/warning_disable.hpp>
 
 //  See deprecated_test for tests of deprecated features
-#ifndef BOOST_FILESYSTEM_NO_DEPRECATED 
-#  define BOOST_FILESYSTEM_NO_DEPRECATED
+#ifndef FILESYSTEM8_NO_DEPRECATED 
+#  define FILESYSTEM8_NO_DEPRECATED
 #endif
 #ifndef BOOST_SYSTEM_NO_DEPRECATED 
 #  define BOOST_SYSTEM_NO_DEPRECATED
@@ -89,9 +89,9 @@ inline void unsetenv(const char* name)
 //  file stream I/O, use path::string() to get a narrow character c_str()
 #if defined(BOOST_WINDOWS_API) \
   && (!defined(_CPPLIB_VER) || _CPPLIB_VER < 405)  // not Dinkumware || no wide overloads
-# define BOOST_FILESYSTEM_C_STR string().c_str()  // use narrow, since wide not available
+# define FILESYSTEM8_C_STR string().c_str()  // use narrow, since wide not available
 #else  // use the native c_str, which will be narrow on POSIX, wide on Windows
-# define BOOST_FILESYSTEM_C_STR c_str()
+# define FILESYSTEM8_C_STR c_str()
 #endif
 
 #define CHECK_EXCEPTION(Functor,Expect) throws_fs_error(Functor,Expect,__LINE__)
@@ -122,7 +122,7 @@ namespace
 
   void create_file(const fs::path & ph, const std::string & contents = std::string())
   {
-    std::ofstream f(ph.BOOST_FILESYSTEM_C_STR);
+    std::ofstream f(ph.FILESYSTEM8_C_STR);
     if (!f)
       throw fs::filesystem_error("operations_test create_file",
       ph, error_code(errno, system_category()));
@@ -131,7 +131,7 @@ namespace
 
   void verify_file(const fs::path & ph, const std::string & expected)
   {
-    std::ifstream f(ph.BOOST_FILESYSTEM_C_STR);
+    std::ifstream f(ph.FILESYSTEM8_C_STR);
     if (!f)
       throw fs::filesystem_error("operations_test verify_file",
         ph, error_code(errno, system_category()));
@@ -1927,12 +1927,12 @@ namespace
       fs::path ph = fs::temp_directory_path()/"temp_directory_path_test.txt";
       {
           if(exists(ph)) remove(ph);
-          std::ofstream f(ph.BOOST_FILESYSTEM_C_STR);
+          std::ofstream f(ph.FILESYSTEM8_C_STR);
           f << "passed";
       }
       BOOST_TEST(exists(ph));
       {
-          std::ifstream f(ph.BOOST_FILESYSTEM_C_STR);
+          std::ifstream f(ph.FILESYSTEM8_C_STR);
           std::string   s;
           f >> s;
           BOOST_TEST(s == "passed");

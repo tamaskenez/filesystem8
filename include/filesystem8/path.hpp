@@ -29,9 +29,7 @@
 #include <locale>
 #include <algorithm>
 
-namespace boost
-{
-namespace filesystem
+namespace filesystem8
 {
 
   //------------------------------------------------------------------------------------//
@@ -124,7 +122,7 @@ namespace filesystem
   //  for VC++, GCC, and probably other compilers, that =default is not used with noexcept
   //  functions. GCC is not even consistent for the same release on different platforms.
 
-# if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+# if !defined(FILESYSTEM8_NO_CXX11_RVALUE_REFERENCES)
     path(path&& p) FILESYSTEM8_NOEXCEPT { m_pathname = std::move(p.m_pathname); }
     path& operator=(path&& p) FILESYSTEM8_NOEXCEPT
       { m_pathname = std::move(p.m_pathname); return *this; }
@@ -565,8 +563,7 @@ namespace filesystem
 //                     class path member template specializations                       //
 //--------------------------------------------------------------------------------------//
 
-}  // namespace filesystem
-}  // namespace boost
+}  // namespace filesystem8
 
 //----------------------------------------------------------------------------//
 

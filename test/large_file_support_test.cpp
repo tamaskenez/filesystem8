@@ -8,7 +8,7 @@
 //  See library home page at http://www.boost.org/libs/filesystem
 
 //  See deprecated_test for tests of deprecated features
-#define BOOST_FILESYSTEM_NO_DEPRECATED
+#define FILESYSTEM8_NO_DEPRECATED
 #define BOOST_SYSTEM_NO_DEPRECATED
 
 #include <filesystem8/operations.hpp>

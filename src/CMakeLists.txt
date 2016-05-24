@@ -9,10 +9,11 @@ add_library(filesystem8
     #windows_file_codecvt
 )
 
-if(COMPILER_IS_GNUXX AND CMAKE_SYSTEM MATCHES HPUX)
-    target_compiler_definitions(filesystem8 PRIVATE
-        _INCLUDE_STDC__SOURCE_199901)
-endif()
+# please fix and enable this if you can test it on hpux machine
+# if(COMPILER_IS_GNUXX AND CMAKE_SYSTEM MATCHES HPUX)
+#    target_compiler_definitions(filesystem8 PRIVATE
+#        _INCLUDE_STDC__SOURCE_199901)
+#endif()
 
 include(GenerateExportHeader)
 generate_export_header(filesystem8
